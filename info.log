@@ -1,0 +1,24 @@
+{"message":"User with id 20 not found.","level":"error"}
+{"message":"User with id 1 not found.","level":"error"}
+{"message":"User with id 1 not found.","level":"error"}
+{"message":"User with id 2 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 12 deleted.","level":"info"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"Invalid user type 'teacher' supplied","level":"error"}
+{"message":"User with id b23fbabb-0929-40d3-a6d8-959c981cd9e3 created","level":"info"}
+{"message":"User with id 4b431952-e7d4-492f-944e-2ec5667a129e created","level":"info"}
+{"message":"User with id 74a263e5-9e25-439d-a6d2-ddf34a2b0722 created","level":"info"}
+{"message":"User with id 74a263e5-9e25-439d-a6d2-ddf34a2b0722 deleted.","level":"info"}
+{"message":"User with id 12 deleted.","level":"info"}
+{"message":"User with id 12 not found.","level":"error"}

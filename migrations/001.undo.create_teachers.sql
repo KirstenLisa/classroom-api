@@ -1,0 +1,8 @@
+  
+BEGIN;
+
+
+
+DROP TABLE IF EXISTS teachers;
+
+COMMIT;
