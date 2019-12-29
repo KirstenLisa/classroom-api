@@ -7,6 +7,9 @@ const jsonBodyParser = express.json()
 
 updatesRouter
   .route('/')
+  .get((req, res) => {
+    res.json('Hallo updates')
+  })
 
 
 

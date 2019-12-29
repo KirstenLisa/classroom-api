@@ -4,6 +4,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
+const teachersRouter = require('./teachers/teachers-router')
+const classesRouter = require('./classes/classes-router')
 const usersRouter = require('./users/users-router')
 const homeworkRouter = require('./homework/homework-router')
 const updatesRouter = require('./updates/updates-router')
@@ -24,9 +26,11 @@ app.get('/', (req, res) => {
   res.send('Hello, classroom!')
 })
 
+app.use('/api/teachers', teachersRouter)
+app.use('/api/classes', classesRouter)
 app.use('/api/users', usersRouter)
-//app.use('/api/homework', homeworkRouter)
-//app.use('/api/updates', updatesRouter)
+app.use('/api/homework', homeworkRouter)
+app.use('/api/updates', updatesRouter)
 app.use('/api/comments', commentsRouter)
 
 

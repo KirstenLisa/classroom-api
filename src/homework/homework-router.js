@@ -7,6 +7,9 @@ const jsonBodyParser = express.json()
 
 homeworkRouter
   .route('/')
+  .get((req, res) => {
+    res.json('Hallo homework')
+  })
 
 
 
