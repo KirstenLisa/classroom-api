@@ -30,35 +30,35 @@ usersRouter
     .catch(next)
   })
 
-  .post(jsonBodyParser, (req, res) => {
-    for (const field of ['fullname', 'username', 'password', 'class_id', 'user_type']) {
-      if (!req.body[field]) {
-        logger.error(`${field} is required`)
-        return res.status(400).send(`'${field}' is required`)
+  .post(jsonBodyParser, (req, res, next) => {
+    const { fullname, username, password, class_id, user_type } = req.body
+    const newUser = { fullname, username, password, class_id, user_type }
+
+    for (const [key, value] of Object.entries(newUser)) {
+      if (value == null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        })
       }
     }
-    const { fullname, username, password, class_id, user_type } = req.body
 
-    if (!Number.isInteger(class_id) || class_id < 0 || class_id > 6) {
-      logger.error(`Invalid class id '${class_id}' supplied`)
-      return res.status(400).send(`'class id' must be between 1 and 6`)
-    }
+    newUser.fullname = fullname;
+    newUser.username = username;
+    newUser.password = password;
+    newUser.class_id = class_id;
+    newUser.user_type = user_type;
 
-    //if (user_type != 'teacher' || user_type != 'student' || user_type != 'parent') {
-    //    logger.error(`Invalid user type '${user_type}' supplied`)
-    //    return res.status(400).send(`'user_type' must be teacher, parent or student`)
-    //  }
-    
-
-    const newUser = { user_id: uuid(), fullname, username, password, class_id, user_type }
-
-    STORE.usersList.push(newUser)
-
-    logger.info(`User with id ${newUser.user_id} created`)
-    res
-      .status(201)
-      .location(`http://localhost:8000/users/${newUser.user_id}`)
-      .json(newUser)
+    UsersService.insertUser(
+      req.app.get('db'),
+      newUser
+    )
+      .then(user => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${user.user_id}`))
+          .json(serializeUser(user))
+      })
+      .catch(next)
   })
 
 usersRouter

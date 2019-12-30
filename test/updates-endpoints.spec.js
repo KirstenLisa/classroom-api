@@ -219,8 +219,95 @@ describe('DELETE /updates/:id', () => {
                   )
               })
             })
-          })            
+          })  
+          
+          
+  describe(`POST /users`, () => {
 
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+            
+        })
+      })
+        
+    it(`creates a user, responding with 201 and the new article`, function() {
+      this.retries(3)
+      const newUpdate = {
+        update_id: 5,
+        headline: 'Test new headline',
+        content: 'test new content',
+        class_id: 2,
+        author: 'test new author',
+        date: '2019-04-22T16:28:32.615Z'
+        }
+
+      return supertest(app)
+        .post('/api/updates')
+        .send(newUpdate)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.headline).to.eql(newUpdate.headline)
+          expect(res.body.content).to.eql(newUpdate.content)
+          expect(res.body.class_id).to.eql(newUpdate.class_id)
+          expect(res.body.author).to.eql(newUpdate.author)
+          expect(res.body).to.have.property('update_id')
+          expect(res.headers.location).to.eql(`/api/updates/${res.body.update_id}`)
+                })
+            .then(postRes =>
+              supertest(app)
+              .get(`/api/updates/${postRes.body.update_id}`)
+              .expect(postRes.body)
+                )
+            })
+            
+      const requiredFields = ['headline', 'content', 'class_id', 'author']
+            
+        requiredFields.forEach(field => {
+          const newUpdate = {
+            headline: 'Test new headline',
+            content: 'test new content',
+            class_id: 2,
+            author: 'test new author',
+            }
+            
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newUpdate[field]
+            
+        return supertest(app)
+          .post('/api/updates')
+          .send(newUpdate)
+          .expect(400, {
+            error: { message: `Missing '${field}' in request body` }
+                     })
+                 })
+               })
+                 
+      it('removes XSS attack content', () => {
+        const { maliciousUpdate, expectedUpdate } = makeMaliciousUpdate();
+          return supertest(app)
+            .post('/api/updates')
+            .send(maliciousUpdate)
+            .expect(201)
+            .expect(res => {
+              expect(res.body.headline).to.eql(expectedUpdate.headline)
+              expect(res.body.content).to.eql(expectedUpdate.content)
+              expect(res.body.class_id).to.eql(expectedUpdate.class_id)
+              expect(res.body.author).to.eql(expectedUpdate.author)
+              expect(res.body.date).to.eql(expectedUpdate.date)
+                          
+                           })
+                        })
+                      })
+        
 
 
 

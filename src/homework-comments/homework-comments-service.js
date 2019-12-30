@@ -11,6 +11,16 @@ const HomeworkCommentsService = {
         .first()
       },
 
+    insertComment(knex, newComment) {
+        return knex
+          .insert(newComment)
+          .into('homework_comments')
+          .returning('*')
+          .then(rows => {
+              return rows[0]
+              })
+            },
+
     deleteComment(knex, id) {
         return knex('homework_comments')
           .where('comment_id', id)

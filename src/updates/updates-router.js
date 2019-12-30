@@ -27,6 +27,37 @@ updatesRouter
     .catch(next)
   })
 
+  .post(jsonBodyParser, (req, res, next) => {
+    const { headline, content, class_id, author, date } = req.body
+    const newUpdate = { headline, content, class_id, author, date }
+
+    for (const [key, value] of Object.entries(newUpdate)) {
+      if (value == null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        })
+      }
+    }
+
+    newUpdate.headline = headline;
+    newUpdate.content = content;
+    newUpdate.class_id = class_id;
+    newUpdate.author = author;
+    newUpdate.date = date;
+
+    UpdatesService.insertUpdate(
+      req.app.get('db'),
+      newUpdate
+    )
+      .then(update => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${update.update_id}`))
+          .json(serializeUpdate(update))
+      })
+      .catch(next)
+  })
+
 updatesRouter
   .route('/:updateId')
   .all((req, res, next) => {
@@ -48,8 +79,8 @@ updatesRouter
   })
   .get((req, res, next) => {
     res.json(serializeUpdate(res.update))
- 
   })
+
   .delete((req, res, next) => {
     UpdatesService.deleteUpdate(
       req.app.get('db'),

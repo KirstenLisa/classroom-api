@@ -169,51 +169,146 @@ describe('DELETE /homework/:id', () => {
                     })
                   })
             
-        context('Given there IS homework in the database', () => {
-          const testTeachers = makeTeachersArray()
-              const testClasses = makeClassesArray()
-              const testUsers = makeUsersArray()
-              const testHomework = makeHomeworkArray()
+  context('Given there IS homework in the database', () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testHomework = makeHomeworkArray()
         
-          beforeEach('insert data', () => {
-            return db
-              .into('teachers')
-              .insert(testTeachers)
-              .then(() => {
-                return db
-                  .into('class_list')
-                  .insert(testClasses)
-                  .then(() => {
-                    return db
-                    .into('classroom_users')
-                    .insert(testUsers)
-                    .then(() => {
-                        return db
-                        .into('homework')
-                        .insert(testHomework)
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+            .then(() => {
+              return db
+                .into('classroom_users')
+                .insert(testUsers)
+                .then(() => {
+                  return db
+                    .into('homework')
+                    .insert(testHomework)
                     })
                   })
                 })
               })
               
       
-          it('removes the homework by ID from the store', () => {
-            const idToRemove = 2
-            const expectedHomework = testHomework.filter(homework => homework.id !== idToRemove)
-                      return supertest(app)
-                        .delete(`/api/homework/${idToRemove}`)
-                        .expect(204)
-                        .then(() =>
-                          supertest(app)
-                            .get(`/api/homework`)
-                            .expect(expectedHomework)
+    it('removes the homework by ID from the store', () => {
+      const idToRemove = 2
+      const expectedHomework = testHomework.filter(homework => homework.id !== idToRemove)
+        return supertest(app)
+          .delete(`/api/homework/${idToRemove}`)
+          .expect(204)
+          .then(() =>
+            supertest(app)
+            .get(`/api/homework`)
+            .expect(expectedHomework)
                         )
                     })
                   })
                 })            
       
   
+  describe(`POST /homework`, () => {
 
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+              
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+        })
+      })
+                      
+      it(`creates a homework, responding with 201 and the new homework`, function() {
+        this.retries(3)
+        const newHomework = {
+          homework_id: 11,
+          subject: 'Math',
+          homework: 'test new homework',
+          due_date: '2019-04-22T16:28:32.615Z',
+          teacher_id: 1,
+          teacher_name: "test-teacher-name-1",
+          class_id: 2
+        }
+              
+        return supertest(app)
+          .post('/api/homework')
+          .send(newHomework)
+          .expect(201)
+          .expect(res => {
+            expect(res.body.homework_id).to.eql(newHomework.homework_id)
+            expect(res.body.subject).to.eql(newHomework.subject)
+            expect(res.body.homework).to.eql(newHomework.homework)
+            expect(res.body.due_date).to.eql(newHomework.due_date)
+            expect(res.body.teacher_id).to.eql(newHomework.teacher_id)
+            expect(res.body.teacher_name).to.eql(newHomework.teacher_name)
+            expect(res.body.class_id).to.eql(newHomework.class_id)
+            expect(res.body).to.have.property('id')
+            expect(res.headers.location).to.eql(`/api/homework/${res.body.id}`)
+            })
+              .then(postRes =>
+                supertest(app)
+                  .get(`/api/homework/${postRes.body.id}`)
+                  .expect(postRes.body)
+                  )
+              })
+                          
+    const requiredFields = ['homework_id', 'subject', 'homework', 'due_date', 'teacher_id', 'teacher_name', 'class_id']
+                          
+      requiredFields.forEach(field => {
+        const newHomework = {
+          homework_id: 11,
+          subject: 'Math',
+          homework: 'test new homework',
+          due_date: '2019-04-22T16:28:32.615Z',
+          teacher_id: 1,
+          teacher_name: "test-teacher-name-1",
+          class_id: 2
+        }
+                    
+      
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newHomework[field]
+                          
+        return supertest(app)
+          .post('/api/homework')
+          .send(newHomework)
+          .expect(400, {
+            error: { message: `Missing '${field}' in request body` }
+                                   })
+                               })
+                             })
+                               
+      it('removes XSS attack content', () => {
+        const { maliciousHomework, expectedHomework } = makeMaliciousHomework();
+          return supertest(app)
+            .post('/api/homework')
+            .send(maliciousHomework)
+            .expect(201)
+            .expect(res => {
+              expect(res.body.homework_id).to.eql(expectedHomework.homework_id)
+              expect(res.body.subject).to.eql(expectedHomework.subject)
+            expect(res.body.homework).to.eql(expectedHomework.homework)
+            expect(res.body.due_date).to.eql(expectedHomework.due_date)
+            expect(res.body.teacher_id).to.eql(expectedHomework.teacher_id)
+            expect(res.body.teacher_name).to.eql(expectedHomework.teacher_name)
+            expect(res.body.class_id).to.eql(expectedHomework.class_id)
+            expect(res.body).to.have.property('id')
+            expect(res.headers.location).to.eql(`/api/homework/${res.body.id}`)
+                                        
+                                         })
+                                      })
+                                    })
 
     })
 

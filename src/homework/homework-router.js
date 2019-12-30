@@ -27,6 +27,40 @@ homeworkRouter
     })
     .catch(next)
   })
+  .post(jsonBodyParser, (req, res, next) => {
+    const { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id } = req.body
+    const newHomework = { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id }
+
+    for (const [key, value] of Object.entries(newHomework)) {
+      if (value == null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        })
+      }
+    }
+
+    newHomework.homework_id = homework_id;
+    newHomework.subject = subject;
+    newHomework.homework = homework;
+    newHomework.due_date = due_date;
+    newHomework.teacher_id = teacher_id;
+    newHomework.teacher_name = teacher_name;
+    newHomework.class_id = class_id;
+
+    HomeworkService.insertHomework(
+      req.app.get('db'),
+      newHomework
+    )
+      .then(homework => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${homework.id}`))
+          .json(serializeHomework(homework))
+      })
+      .catch(next)
+  })
+
+
 
 homeworkRouter
 .route('/:id')

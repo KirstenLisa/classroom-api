@@ -10,6 +10,16 @@ const UpdatesCommentsService = {
         .where('comment_id', id)
         .first()
       },
+    
+    insertComment(knex, newComment) {
+      return knex
+        .insert(newComment)
+        .into('updates_comments')
+        .returning('*')
+        .then(rows => {
+            return rows[0]
+            })
+          },
 
     deleteComment(knex, id) {
         return knex('updates_comments')

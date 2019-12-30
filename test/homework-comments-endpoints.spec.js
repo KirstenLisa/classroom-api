@@ -240,6 +240,106 @@ describe(`Homework-comments service object`, function() {
                           })  
 
 
+
+  describe(`POST /homework-comments`, () => {
+
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testHomework = makeHomeworkArray()
+                                            
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+            .then(() => {
+              return db
+                .into('classroom_users')
+                .insert(testUsers)
+                  .then(() => {
+                    return db
+                      .into('homework')
+                      .insert(testHomework)
+      })
+    })                        
+  })
+})
+                                                    
+    it(`creates a comment, responding with 201 and the new comment`, function() {
+      this.retries(3)
+      const newHomeworkComment = {
+        comment_id: 5,
+        comment: 'Test new comment homework',
+        user_name: 'test-username-1',
+        date: '2019-04-22T16:28:32.615Z',
+        user_id: 1,
+        page_id: 11
+    }
+                                            
+      return supertest(app)
+        .post('/api/homework-comments')
+        .send(newHomeworkComment)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.comment).to.eql(newHomeworkComment.comment)
+          expect(res.body.user_name).to.eql(newHomeworkComment.user_name)
+          expect(res.body.date).to.eql(newHomeworkComment.date)
+          expect(res.body.user_id).to.eql(newHomeworkComment.user_id)
+          expect(res.body.page_id).to.eql(newHomeworkComment.page_id)
+          expect(res.body).to.have.property('comment_id')
+          expect(res.headers.location).to.eql(`/api/homework-comments/${res.body.comment_id}`)
+          })
+          .then(postRes =>
+            supertest(app)
+            .get(`/api/homework-comments/${postRes.body.comment_id}`)
+            .expect(postRes.body)
+          )
+        })
+                                                        
+      const requiredFields = ['comment', 'user_name', 'date', 'user_id', 'page_id']
+                                                        
+      requiredFields.forEach(field => {
+        const newHomeworkComment = {
+          comment: 'Test new comment homework',
+          user_name: 'test-username-1',
+          date: '2019-04-22T16:28:32.615Z',
+          user_id: 1,
+          page_id: 11
+      }
+                                                        
+    it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+      delete newHomeworkComment[field]
+                                                        
+      return supertest(app)
+      .post('/api/homework-comments')
+      .send(newHomeworkComment)
+      .expect(400, {
+        error: { message: `Missing '${field}' in request body` }
+      })
+    })
+  })
+                                                             
+  it('removes XSS attack content', () => {
+    const { maliciousComment, expectedComment } = makeMaliciousComment();
+    return supertest(app)
+      .post('/api/homework-comments')
+      .send(maliciousComment)
+      .expect(201)
+      .expect(res => {
+          expect(res.body.comment).to.eql(expectedComment.comment)
+          expect(res.body.user_name).to.eql(expectedComment.user_name)
+          expect(res.body.date).to.eql(expectedComment.date)
+          expect(res.body.user_id).to.eql(expectedComment.user_id)
+          expect(res.body.page_id).to.eql(expectedComment.page_id)
+        })
+      })
+    })                     
+                        
+
     })
 
 

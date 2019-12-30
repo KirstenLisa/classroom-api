@@ -197,9 +197,89 @@ describe('DELETE /users/:user_id', () => {
       })
 
 
+  describe(`POST /users`, () => {
 
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+        })
+      })
 
-
+    it(`creates a user, responding with 201 and the new article`, function() {
+      this.retries(3)
+      const newUser = {
+        fullname: 'Test new user',
+        username: 'test new username',
+        password: 'Test password',
+        class_id: 2,
+        user_type: 'student'
+            }
+          return supertest(app)
+            .post('/api/users')
+            .send(newUser)
+            .expect(201)
+            .expect(res => {
+              expect(res.body.fullname).to.eql(newUser.fullname)
+              expect(res.body.username).to.eql(newUser.username)
+              expect(res.body.password).to.eql(newUser.password)
+              expect(res.body.class_id).to.eql(newUser.class_id)
+              expect(res.body.user_type).to.eql(newUser.user_type)
+              expect(res.body).to.have.property('user_id')
+              expect(res.headers.location).to.eql(`/api/users/${res.body.user_id}`)
+               })
+               .then(postRes =>
+                supertest(app)
+                .get(`/api/users/${postRes.body.user_id}`)
+                .expect(postRes.body)
+                )
+            })
+    
+        const requiredFields = ['fullname', 'username', 'password', 'class_id', 'user_type']
+    
+        requiredFields.forEach(field => {
+        const newUser = {
+          fullname: 'Test new user',
+          username: 'test new username',
+          password: 'Test password',
+          class_id: 2,
+          user_type: 'student'
+         }
+    
+         it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+           delete newUser[field]
+    
+           return supertest(app)
+             .post('/api/users')
+             .send(newUser)
+             .expect(400, {
+               error: { message: `Missing '${field}' in request body` }
+             })
+         })
+       })
+         
+        it('removes XSS attack content', () => {
+          const { maliciousUser, expectedUser } = makeMaliciousUser();
+            return supertest(app)
+              .post('/api/users')
+              .send(maliciousUser)
+              .expect(201)
+              .expect(res => {
+                expect(res.body.fullname).to.eql(expectedUser.fullname)
+                expect(res.body.username).to.eql(expectedUser.username)
+                expect(res.body.password).to.eql(expectedUser.password)
+                expect(res.body.class_id).to.eql(expectedUser.class_id)
+                expect(res.body.user_type).to.eql(expectedUser.user_type)
+                  
+                   })
+                })
+              })
 
 
 

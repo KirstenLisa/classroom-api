@@ -29,36 +29,39 @@ homeworkCommentsRouter
     .catch(next)
   })
 
-  .post(jsonBodyParser, (req, res) => {
-    for (const field of ['fullname', 'username', 'password', 'class_id', 'user_type']) {
-      if (!req.body[field]) {
-        logger.error(`${field} is required`)
-        return res.status(400).send(`'${field}' is required`)
+  .post(jsonBodyParser, (req, res, next) => {
+    const { comment, user_name, date, user_id, page_id } = req.body
+    const newHomeworkComment = { comment, user_name, date, user_id, page_id }
+
+    for (const [key, value] of Object.entries(newHomeworkComment)) {
+      if (value == null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        })
       }
     }
-    const { fullname, username, password, class_id, user_type } = req.body
 
-    if (!Number.isInteger(class_id) || class_id < 0 || class_id > 6) {
-      logger.error(`Invalid class id '${class_id}' supplied`)
-      return res.status(400).send(`'class id' must be between 1 and 6`)
-    }
+    newHomeworkComment.comment = comment;
+    newHomeworkComment.user_name = user_name;
+    newHomeworkComment.date = date;
+    newHomeworkComment.user_id = user_id;
+    newHomeworkComment.page_id = page_id;
 
-    //if (user_type != 'teacher' || user_type != 'student' || user_type != 'parent') {
-    //    logger.error(`Invalid user type '${user_type}' supplied`)
-    //    return res.status(400).send(`'user_type' must be teacher, parent or student`)
-    //  }
-    
-
-    const newUser = { user_id: uuid(), fullname, username, password, class_id, user_type }
-
-    STORE.usersList.push(newUser)
-
-    logger.info(`User with id ${newUser.user_id} created`)
-    res
-      .status(201)
-      .location(`http://localhost:8000/users/${newUser.user_id}`)
-      .json(newUser)
+    HomeworkCommentsService.insertComment(
+      req.app.get('db'),
+      newHomeworkComment
+    )
+      .then(comment => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${comment.comment_id}`))
+          .json(serializeHomeworkComment(comment))
+      })
+      .catch(next)
   })
+
+
+
 
 homeworkCommentsRouter
   .route('/:commentId')
@@ -84,6 +87,7 @@ homeworkCommentsRouter
  
   })
 
+  
   .delete((req, res, next) => {
     HomeworkCommentsService.deleteComment(
       req.app.get('db'),

@@ -10,6 +10,16 @@ const UsersService = {
         .where('user_id', id)
         .first()
       },
+    
+    insertUser(knex, newUser) {
+      return knex
+        .insert(newUser)
+        .into('classroom_users')
+        .returning('*')
+        .then(rows => {
+            return rows[0]
+          })
+      },
 
     deleteUser(knex, id) {
         return knex('classroom_users')

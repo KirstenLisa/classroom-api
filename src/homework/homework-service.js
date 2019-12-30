@@ -11,6 +11,16 @@ const HomeworkService = {
         .first()
       },
 
+    insertHomework(knex, newHomework) {
+      return knex
+        .insert(newHomework)
+        .into('homework')
+        .returning('*')
+        .then(rows => {
+          return rows[0]
+          })
+        },
+
     deleteHomework(knex, id) {
         return knex('homework')
           .where('id', id)
