@@ -154,6 +154,67 @@ describe(`Homework service object`, function() {
        })
       })
       })
+
+
+describe('DELETE /homework/:id', () => {
+        
+  context(`Given no homework`, () => {
+                    
+          it(`responds 404 the homework doesn't exist`, () => {
+            return supertest(app)
+              .delete(`/api/homework/123`)
+              .expect(404, {
+                error: { message: `Homework doesn't exist` }
+                        })
+                    })
+                  })
+            
+        context('Given there IS homework in the database', () => {
+          const testTeachers = makeTeachersArray()
+              const testClasses = makeClassesArray()
+              const testUsers = makeUsersArray()
+              const testHomework = makeHomeworkArray()
+        
+          beforeEach('insert data', () => {
+            return db
+              .into('teachers')
+              .insert(testTeachers)
+              .then(() => {
+                return db
+                  .into('class_list')
+                  .insert(testClasses)
+                  .then(() => {
+                    return db
+                    .into('classroom_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                        .into('homework')
+                        .insert(testHomework)
+                    })
+                  })
+                })
+              })
+              
+      
+          it('removes the homework by ID from the store', () => {
+            const idToRemove = 2
+            const expectedHomework = testHomework.filter(homework => homework.id !== idToRemove)
+                      return supertest(app)
+                        .delete(`/api/homework/${idToRemove}`)
+                        .expect(204)
+                        .then(() =>
+                          supertest(app)
+                            .get(`/api/homework`)
+                            .expect(expectedHomework)
+                        )
+                    })
+                  })
+                })            
+      
+  
+
+
     })
 
 

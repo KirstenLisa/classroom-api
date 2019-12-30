@@ -51,5 +51,15 @@ homeworkRouter
     res.json(serializeHomework(res.homework))
  
   })
+  .delete((req, res, next) => {
+    HomeworkService.deleteHomework(
+      req.app.get('db'),
+      req.params.id
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
 
 module.exports = homeworkRouter

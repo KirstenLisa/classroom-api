@@ -50,6 +50,16 @@ updatesRouter
     res.json(serializeUpdate(res.update))
  
   })
+  .delete((req, res, next) => {
+    UpdatesService.deleteUpdate(
+      req.app.get('db'),
+      req.params.updateId
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
 
 
 module.exports = updatesRouter

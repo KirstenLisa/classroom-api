@@ -10,6 +10,12 @@ const HomeworkService = {
         .where('id', id)
         .first()
       },
+
+    deleteHomework(knex, id) {
+        return knex('homework')
+          .where('id', id)
+          .delete()
+      },
 }
 
 

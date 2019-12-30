@@ -83,6 +83,17 @@ homeworkCommentsRouter
     res.json(serializeHomeworkComment(res.comment))
  
   })
+
+  .delete((req, res, next) => {
+    HomeworkCommentsService.deleteComment(
+      req.app.get('db'),
+      req.params.commentId
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
  
 
 

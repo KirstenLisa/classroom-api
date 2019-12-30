@@ -10,6 +10,12 @@ const UpdatesService = {
         .where('update_id', id)
         .first()
       },
+
+    deleteUpdate(knex, id) {
+        return knex('updates')
+          .where('update_id', id)
+          .delete()
+      },
 }
 
 

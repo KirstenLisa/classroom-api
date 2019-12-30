@@ -84,6 +84,16 @@ usersRouter
     res.json(serializeUser(res.user))
  
   })
+  .delete((req, res, next) => {
+    UsersService.deleteUser(
+      req.app.get('db'),
+      req.params.user_id
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
 
 
 

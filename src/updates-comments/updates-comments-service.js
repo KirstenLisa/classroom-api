@@ -10,6 +10,12 @@ const UpdatesCommentsService = {
         .where('comment_id', id)
         .first()
       },
+
+    deleteComment(knex, id) {
+        return knex('updates_comments')
+          .where('comment_id', id)
+          .delete()
+      },
 }
 
 

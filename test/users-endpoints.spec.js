@@ -143,6 +143,57 @@ describe(`Users service object`, function() {
          })
        })
       })
+
+
+describe('DELETE /users/:user_id', () => {
+        
+  context(`Given no users`, () => {
+              
+    it(`responds 404 the user doesn't exist`, () => {
+      return supertest(app)
+        .delete(`/api/users/123`)
+        .expect(404, {
+          error: { message: `User id doesn't exist` }
+                  })
+              })
+            })
+      
+  context('Given there ARE users in the database', () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      })
+        
+      it('removes the note by ID from the store', () => {
+        const idToRemove = 2
+        const expectedUser = testUsers.filter(user => user.user_id !== idToRemove)
+          return supertest(app)
+            .delete(`/api/users/${idToRemove}`)
+            .expect(204)
+            .then(() =>
+              supertest(app)
+                .get(`/api/users`)
+                .expect(expectedUser)
+            )
+              })
+            })
+          })            
+
       })
 
 

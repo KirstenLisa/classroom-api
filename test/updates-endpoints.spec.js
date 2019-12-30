@@ -163,6 +163,68 @@ describe(`Updates service object`, function() {
        })
       })
       })
+
+
+describe('DELETE /updates/:id', () => {
+        
+  context(`Given no updates`, () => {
+              
+    it(`responds 404 the note doesn't exist`, () => {
+      return supertest(app)
+        .delete(`/api/updates/123`)
+        .expect(404, {
+          error: { message: `Update doesn't exist` }
+                  })
+              })
+            })
+      
+  context('Given there ARE updates in the database', () => {
+    const testTeachers = makeTeachersArray()
+        const testClasses = makeClassesArray()
+        const testUsers = makeUsersArray()
+        const testUpdates = makeUpdatesArray()
+  
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+            .then(() => {
+              return db
+              .into('classroom_users')
+              .insert(testUsers)
+              .then(() => {
+                  return db
+                  .into('updates')
+                  .insert(testUpdates)
+              })
+            })
+          })
+        })
+        
+
+    it('removes the update by ID from the store', () => {
+      const idToRemove = 2
+      const expectedUpdate = testUpdates.filter(update => update.update_id !== idToRemove)
+                return supertest(app)
+                  .delete(`/api/updates/${idToRemove}`)
+                  .expect(204)
+                  .then(() =>
+                    supertest(app)
+                      .get(`/api/updates`)
+                      .expect(expectedUpdate)
+                  )
+              })
+            })
+          })            
+
+
+
+
+
     })
 
 

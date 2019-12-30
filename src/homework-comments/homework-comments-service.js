@@ -10,6 +10,12 @@ const HomeworkCommentsService = {
         .where('comment_id', id)
         .first()
       },
+
+    deleteComment(knex, id) {
+        return knex('homework_comments')
+          .where('comment_id', id)
+          .delete()
+      },
 }
 
 

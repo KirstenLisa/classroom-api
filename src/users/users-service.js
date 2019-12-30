@@ -13,7 +13,7 @@ const UsersService = {
 
     deleteUser(knex, id) {
         return knex('classroom_users')
-          .where({ id })
+          .where('user_id', id )
           .delete()
     },
 }

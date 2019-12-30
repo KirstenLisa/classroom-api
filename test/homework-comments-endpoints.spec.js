@@ -34,7 +34,7 @@ describe(`Homework-comments service object`, function() {
 
       })
 
-    context('Given there ARE updates-comments in the database', () => {
+    context('Given there ARE homework-comments in the database', () => {
 
       const testTeachers = makeTeachersArray()
       const testClasses = makeClassesArray()
@@ -175,6 +175,71 @@ describe(`Homework-comments service object`, function() {
        })
       })
       })
+
+
+  describe('DELETE /homework-comments/:id', () => {
+        
+    context(`Given no comments`, () => {
+                              
+      it(`responds 404 the comment doesn't exist`, () => {
+        return supertest(app)
+          .delete(`/api/homework-comments/123`)
+          .expect(404, {
+            error: { message: `Comment doesn't exist` }
+                                  })
+                              })
+                            })
+                      
+    context('Given there ARE comments in the database', () => {
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+      const testHomework = makeHomeworkArray()
+      const testHomeworkComments = makeHomeworkCommentsArray()
+
+      beforeEach('insert data', () => {
+        return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+            .then(() => {
+                return db
+                .into('homework')
+                .insert(testHomework)
+                .then(() => {
+                    return db
+                    .into('homework_comments')
+                    .insert(testHomeworkComments)
+                })
+            })
+          })
+        })
+      })
+                        
+                
+    it('removes the comments by ID from the store', () => {
+      const idToRemove = 2
+      const expectedComment = testHomeworkComments.filter(comment => comment.comment_id !== idToRemove)
+        return supertest(app)
+          .delete(`/api/homework-comments/${idToRemove}`)
+              .expect(204)
+              .then(() =>
+                supertest(app)
+                .get(`/api/homework-comments`)
+                .expect(expectedComment)
+                                  )
+                              })
+                            })
+                          })  
+
+
     })
 
 
