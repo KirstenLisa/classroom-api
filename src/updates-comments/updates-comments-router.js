@@ -1,18 +1,34 @@
 const express = require('express')
 const path = require('path')
+const xss = require('xss')
 const uuid = require('uuid/v4')
-const CommentsService = require('./comments-service')
+const UpdatesCommentsService = require('./updates-comments-service')
 const logger = require('../logger')
 const STORE = require('../dummystore')
 
-const commentsRouter = express.Router()
+const updatesCommentsRouter = express.Router()
 const jsonBodyParser = express.json()
 
-commentsRouter
+const serializeUpdateComment = comment => ({
+  comment_id: comment.comment_id,
+  comment: xss(comment.comment),
+  user_name: comment.user_name,
+  date: comment.date,
+  user_id: comment.user_id,
+  page_id: comment.page_id
+})
+
+updatesCommentsRouter
   .route('/')
-  .get((req, res) => {
-    res.json(STORE.commentsList)
+  .get((req, res, next) => {
+    const knexInstance = req.app.get('db')
+    UpdatesCommentsService.getAllUpdatesComments(knexInstance)
+    .then(comment => {
+      res.json(comment.map(serializeUpdateComment))
+    })
+    .catch(next)
   })
+
   .post(jsonBodyParser, (req, res) => {
     for (const field of ['fullname', 'username', 'password', 'class_id', 'user_type']) {
       if (!req.body[field]) {
@@ -44,42 +60,31 @@ commentsRouter
       .json(newUser)
   })
 
-commentsRouter
-  .route('/:page_id')
-  .get((req, res) => {
-    const { user_id } = req.params
-
-    const user = STORE.usersList.find(user => user.user_id == user_id)
-
-    if (!user) {
-      logger.error(`User with id ${user_id} not found.`)
-      return res
-        .status(404)
-        .send('User Not Found')
-    }
-
-    res.json(user)
+updatesCommentsRouter
+  .route('/:commentId')
+  .all((req, res, next) => {
+    const knexInstance = req.app.get('db')
+    UpdatesCommentsService.getById(
+      knexInstance,
+      req.params.commentId
+    )
+      .then(comment => {
+        if (!comment) {
+          return res.status(404).json({
+            error: { message: `Comment doesn't exist` }
+          })
+        }
+        res.comment = comment
+        next()
+      })
+      .catch(next)
   })
-  .delete((req, res) => {
-    const { user_id } = req.params
-
-    const userIndex = STORE.usersList.findIndex(u => u.user_id == user_id)
-    
-    if (userIndex === -1) {
-      logger.error(`User with id ${user_id} not found.`)
-      return res
-        .status(404)
-        .send('User Not Found')
-    }
-
-    STORE.usersList.splice(userIndex, 1)
-
-    logger.info(`User with id ${user_id} deleted.`)
-    res
-      .status(204)
-      .end()
+  .get((req, res, next) => {
+    res.json(serializeUpdateComment(res.comment))
+ 
   })
+ 
 
 
 
-module.exports = commentsRouter
+module.exports = updatesCommentsRouter

@@ -2,30 +2,29 @@ const express = require('express')
 const path = require('path')
 const xss = require('xss')
 const uuid = require('uuid/v4')
-const UsersService = require('./users-service')
+const HomeworkCommentsService = require('./homework-comments-service')
 const logger = require('../logger')
 const STORE = require('../dummystore')
 
-const usersRouter = express.Router()
+const homeworkCommentsRouter = express.Router()
 const jsonBodyParser = express.json()
 
-const serializeUser = user => ({
-  user_id: user.user_id,
-  fullname: xss(user.fullname),
-  username: xss(user.username),
-  password: xss(user.password),
-  class_id: user.class_id,
-  user_type: xss(user.user_type)
+const serializeHomeworkComment = comment => ({
+  comment_id: comment.comment_id,
+  comment: xss(comment.comment),
+  user_name: comment.user_name,
+  date: comment.date,
+  user_id: comment.user_id,
+  page_id: comment.page_id
 })
 
-usersRouter
+homeworkCommentsRouter
   .route('/')
-
   .get((req, res, next) => {
     const knexInstance = req.app.get('db')
-    UsersService.getAllUsers(knexInstance)
-    .then(user => {
-      res.json(user.map(serializeUser))
+    HomeworkCommentsService.getAllHomeworkComments(knexInstance)
+    .then(comment => {
+      res.json(comment.map(serializeHomeworkComment))
     })
     .catch(next)
   })
@@ -61,30 +60,31 @@ usersRouter
       .json(newUser)
   })
 
-usersRouter
-  .route('/:user_id')
+homeworkCommentsRouter
+  .route('/:commentId')
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
-    UsersService.getById(
+    HomeworkCommentsService.getById(
       knexInstance,
-      req.params.user_id
+      req.params.commentId
     )
-      .then(user => {
-        if (!user) {
+      .then(comment => {
+        if (!comment) {
           return res.status(404).json({
-            error: { message: `User id doesn't exist` }
+            error: { message: `Comment doesn't exist` }
           })
         }
-        res.user = user
+        res.comment = comment
         next()
       })
       .catch(next)
   })
   .get((req, res, next) => {
-    res.json(serializeUser(res.user))
+    res.json(serializeHomeworkComment(res.comment))
  
   })
+ 
 
 
 
-module.exports = usersRouter
+module.exports = homeworkCommentsRouter

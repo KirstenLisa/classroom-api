@@ -9,8 +9,8 @@ const classesRouter = require('./classes/classes-router')
 const usersRouter = require('./users/users-router')
 const homeworkRouter = require('./homework/homework-router')
 const updatesRouter = require('./updates/updates-router')
-const commentsRouter = require('./comments/comments-router')
-
+const updatesCommentsRouter = require('./updates-comments/updates-comments-router')
+const homeworkCommentsRouter = require('./homework-comments/homework-comments-router')
 
 const app = express()
 
@@ -31,7 +31,8 @@ app.use('/api/classes', classesRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/homework', homeworkRouter)
 app.use('/api/updates', updatesRouter)
-app.use('/api/comments', commentsRouter)
+app.use('/api/updates-comments', updatesCommentsRouter)
+app.use('/api/homework-comments', homeworkCommentsRouter)
 
 
 

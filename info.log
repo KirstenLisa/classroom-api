@@ -22,3 +22,4 @@
 {"message":"User with id 74a263e5-9e25-439d-a6d2-ddf34a2b0722 deleted.","level":"info"}
 {"message":"User with id 12 deleted.","level":"info"}
 {"message":"User with id 12 not found.","level":"error"}
+{"message":"User with id 123 not found.","level":"error"}
