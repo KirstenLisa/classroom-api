@@ -197,6 +197,106 @@ describe('DELETE /users/:user_id', () => {
       })
 
 
+describe(`PATCH /api/users/:user_id`, () => {
+  context(`Given no users`, () => {
+    it(`responds with 404`, () => {
+      const userId = 123456
+      return supertest(app)
+      .patch(`/api/users/${userId}`)
+      .expect(404, { error: { message: `User id doesn't exist` } })
+           })
+         })
+
+  context('Given there are users in the database', () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+        
+    beforeEach('insert data', () => {
+    return db
+      .into('teachers')
+      .insert(testTeachers)
+      .then(() => {
+        return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+              .into('classroom_users')
+              .insert(testUsers)
+        })
+      })
+    })
+            
+    it('responds with 204 and updates the user', () => {
+              
+      const idToUpdate = 2
+      const updatedUser = {
+        fullname: 'updated fullname',
+        username: 'updated username',
+        password: 'updated password',
+        class_id: 1,
+        user_type: 'parent'
+        }
+
+      const expectedUser = {
+        ...testUsers[idToUpdate - 1],
+        ...updatedUser
+        }
+                 
+      return supertest(app)
+        .patch(`/api/users/${idToUpdate}`)
+        .send(updatedUser)
+        .expect(204)
+        .then(res =>
+          supertest(app)
+            .get(`/api/users/${idToUpdate}`)
+            .expect(expectedUser)
+          )
+        })
+
+      it(`responds with 400 when no required fields supplied`, () => {
+        const idToUpdate = 2
+        return supertest(app)
+        .patch(`/api/users/${idToUpdate}`)
+        .send({ irrelevantField: 'foo' })
+        .expect(400, {
+          error: {
+            message: `Request body must contain either 'fullname', 'username', 'password', 'class_id' or 'user_type'`
+                   }
+                 })
+                })
+
+      it(`responds with 204 when updating only a subset of fields`, () => {
+        const idToUpdate = 2
+        const updatedUser = {
+                          fullname: 'updated fullname',
+                     }
+        const expectedUser = {
+          ...testUsers[idToUpdate - 1],
+          ...updatedUser
+        }
+                  
+        return supertest(app)
+          .patch(`/api/users/${idToUpdate}`)
+          .send({
+            ...updatedUser,
+            fieldToIgnore: 'should not be in GET response'
+                  })
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get(`/api/users/${idToUpdate}`)
+              .expect(expectedUser)
+          )
+        })
+      })
+
+    })
+
+
+
+
   describe(`POST /users`, () => {
 
     const testTeachers = makeTeachersArray()
@@ -279,9 +379,7 @@ describe('DELETE /users/:user_id', () => {
                   
                    })
                 })
-              })
-
-
+              })             
 
     })
 

@@ -153,7 +153,7 @@ describe(`Updates service object`, function() {
           })
         })
 
-    it('responds with 200 and the specified user', () => {
+    it('responds with 200 and the specified update', () => {
       const updateId = 2
       const expectedUpdate = testUpdates[updateId - 1]
         return supertest(app)
@@ -221,8 +221,117 @@ describe('DELETE /updates/:id', () => {
             })
           })  
           
+    
           
-  describe(`POST /users`, () => {
+describe(`PATCH /api/update/:update_id`, () => {
+  context(`Given no updates`, () => {
+  
+    it(`responds with 404`, () => {
+      const updateId = 123456
+      return supertest(app)
+      .patch(`/api/updates/${updateId}`)
+      .expect(404, { error: { message: `Update doesn't exist` } })
+      })
+    })
+          
+  context('Given there ARE updates in the database', () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testUpdates = makeUpdatesArray()
+    
+    beforeEach('insert data', () => {
+        return db
+          .into('teachers')
+          .insert(testTeachers)
+          .then(() => {
+            return db
+              .into('class_list')
+              .insert(testClasses)
+              .then(() => {
+                return db
+                .into('classroom_users')
+                .insert(testUsers)
+                .then(() => {
+                    return db
+                    .into('updates')
+                    .insert(testUpdates)
+                })
+              })
+            })
+          }) 
+
+  it('responds with 204 and updates the updates', () => {
+                        
+    const idToUpdate = 2
+    const updatedUpdate = {
+      headline: 'updated headline',
+      content: 'updated content',
+      class_id: 1,
+      author: 'updated author',
+      date: '2019-04-22T16:28:32.615Z'
+      }
+          
+    const expectedUpdate = {
+      ...testUpdates[idToUpdate - 1],
+      ...updatedUpdate
+                  }
+                           
+    return supertest(app)
+      .patch(`/api/updates/${idToUpdate}`)
+      .send(updatedUpdate)
+      .expect(204)
+      .then(res =>
+        supertest(app)
+        .get(`/api/updates/${idToUpdate}`)
+        .expect(expectedUpdate)
+      )
+    }) 
+                
+    it(`responds with 400 when no required fields supplied`, () => {
+                  
+      const idToUpdate = 2
+        return supertest(app)
+        .patch(`/api/updates/${idToUpdate}`)
+        .send({ irrelevantField: 'foo' })
+        .expect(400, {
+            error: {
+              message: `Request body must contain either 'headline', 'content', 'class_id', 'author' or 'date'`
+            }
+          })
+        })
+                
+    it(`responds with 204 when updating only a subset of fields`, () => {
+                  
+      const idToUpdate = 2
+      const updatedUpdate = {
+            headline: 'updated headline',
+                               }
+      const expectedUpdate = {
+          ...testUpdates[idToUpdate - 1],
+          ...updatedUpdate
+                  }
+                            
+      return supertest(app)
+        .patch(`/api/updates/${idToUpdate}`)
+        .send({
+            ...updatedUpdate,
+            fieldToIgnore: 'should not be in GET response'
+                            })
+        .expect(204)
+        .then(res =>
+          supertest(app)
+          .get(`/api/updates/${idToUpdate}`)
+          .expect(expectedUpdate)
+        )
+      })
+    })
+  })
+                  
+
+
+
+  describe(`POST /updates`, () => {
 
     const testTeachers = makeTeachersArray()
     const testClasses = makeClassesArray()
@@ -239,7 +348,7 @@ describe('DELETE /updates/:id', () => {
         })
       })
         
-    it(`creates a user, responding with 201 and the new article`, function() {
+    it(`creates an update, responding with 201 and the new update`, function() {
       this.retries(3)
       const newUpdate = {
         update_id: 5,

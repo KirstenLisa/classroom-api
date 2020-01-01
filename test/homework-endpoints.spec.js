@@ -211,7 +211,116 @@ describe('DELETE /homework/:id', () => {
                     })
                   })
                 })            
-      
+  
+            
+describe(`PATCH /api/homework/:homework_id`, () => {
+  context(`Given no homework`, () => {
+  
+    it(`responds with 404`, () => {
+      const homeworkId = 123456
+      return supertest(app)
+      .patch(`/api/homework/${homeworkId}`)
+      .expect(404, { error: { message: `Homework doesn't exist` } })
+      })
+    })
+          
+  context('Given there IS homework in the database', () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testHomework = makeHomeworkArray()
+        
+    beforeEach('insert data', () => {
+      return db
+        .into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+            .into('class_list')
+            .insert(testClasses)
+            .then(() => {
+              return db
+                .into('classroom_users')
+                .insert(testUsers)
+                .then(() => {
+                  return db
+                    .into('homework')
+                    .insert(testHomework)
+                    })
+                  })
+                })
+              })
+
+  it('responds with 204 and updates the homework', () => {
+                        
+    const idToUpdate = 2
+    const updatedHomework = {
+      homework_id: 33,
+      subject: 'Math',
+      homework: 'updated homework',
+      due_date: '2019-04-22T16:28:32.615Z',
+      teacher_id: 3,
+      teacher_name: 'test-teacher-name-3',
+      class_id: 2 
+      }
+          
+    const expectedHomework = {
+      ...testHomework[idToUpdate - 1],
+      ...updatedHomework
+                  }
+
+    console.log(idToUpdate)
+                           
+    return supertest(app)
+      .patch(`/api/homework/${idToUpdate}`)
+      .send(updatedHomework)
+      .expect(204)
+      .then(res =>
+        supertest(app)
+        .get(`/api/homework/${idToUpdate}`)
+        .expect(expectedHomework)
+      )
+    }) 
+                
+    it(`responds with 400 when no required fields supplied`, () => {
+                  
+      const idToUpdate = 2
+        return supertest(app)
+        .patch(`/api/homework/${idToUpdate}`)
+        .send({ irrelevantField: 'foo' })
+        .expect(400, {
+            error: {
+              message: `Request body must contain either 'homework_id', 'subject', 'homework', 'due_date', 'teacher_id', 'teacher_name' or class_id'`
+            }
+          })
+        })
+                
+    it(`responds with 204 when updating only a subset of fields`, () => {
+                  
+      const idToUpdate = 2
+      const updatedHomework = {
+            homework: 'updated homework',
+                               }
+      const expectedHomework = {
+          ...testHomework[idToUpdate - 1],
+          ...updatedHomework
+                  }
+                            
+      return supertest(app)
+        .patch(`/api/homework/${idToUpdate}`)
+        .send({
+            ...updatedHomework,
+            fieldToIgnore: 'should not be in GET response'
+                            })
+        .expect(204)
+        .then(res =>
+          supertest(app)
+          .get(`/api/homework/${idToUpdate}`)
+          .expect(expectedHomework)
+        )
+      })
+    })
+  })
   
   describe(`POST /homework`, () => {
 

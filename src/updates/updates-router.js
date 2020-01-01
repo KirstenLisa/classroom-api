@@ -92,5 +92,30 @@ updatesRouter
       .catch(next)
   })
 
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { headline, content, class_id, author, date } = req.body
+    const updateToUpdate = { headline, content, class_id, author, date }
+
+    const numberOfValues = Object.values(updateToUpdate).filter(Boolean).length
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'headline', 'content', 'class_id', 'author' or 'date'`
+        }
+      })
+
+    UpdatesService.updateUpdate(
+      req.app.get('db'),
+      req.params.updateId,
+      updateToUpdate
+    )
+  
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+
+
 
 module.exports = updatesRouter

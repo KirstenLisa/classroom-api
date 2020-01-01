@@ -22,10 +22,16 @@ const HomeworkService = {
         },
 
     deleteHomework(knex, id) {
-        return knex('homework')
+      return knex('homework')
           .where('id', id)
           .delete()
       },
+
+    updateHomework(knex, id, newHomeworkFields) {
+      return knex('homework')
+        .where('id', id)
+        .update(newHomeworkFields)
+        }
 }
 
 

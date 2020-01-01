@@ -22,10 +22,16 @@ const UpdatesService = {
         },
 
     deleteUpdate(knex, id) {
-        return knex('updates')
+      return knex('updates')
           .where('update_id', id)
           .delete()
       },
+  
+    updateUpdate(knex, id, newUpdateFields) {
+      return knex('updates')
+          .where('update_id', id)
+          .update(newUpdateFields)
+      }
 }
 
 

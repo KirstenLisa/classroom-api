@@ -123,7 +123,7 @@ describe(`Homework-comments service object`, function() {
 
     context('Given there are NO homework-comments in the database', () => {
 
-      it(`responds 404 the update doesn't exist`, () => {
+      it(`responds 404 homework doesn't exist`, () => {
         return supertest(app)
           .get(`/api/homework-comments/123`)
           .expect(404, {

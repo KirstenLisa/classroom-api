@@ -26,6 +26,12 @@ const UsersService = {
           .where('user_id', id )
           .delete()
     },
+
+  updateUser(knex, id, newUserFields) {
+      return knex('classroom_users')
+        .where('user_id', id)
+        .update(newUserFields)
+    }
 }
 
 

@@ -96,4 +96,30 @@ homeworkRouter
       .catch(next)
   })
 
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id } = req.body
+    const homeworkToUpdate = { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id }
+
+    const numberOfValues = Object.values(homeworkToUpdate).filter(Boolean).length
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'homework_id', 'subject', 'homework', 'due_date', 'teacher_id', 'teacher_name' or class_id'`
+        }
+      })
+
+    HomeworkService.updateHomework(
+      req.app.get('db'),
+      req.params.id,
+      homeworkToUpdate
+    )
+  
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+
+
+
 module.exports = homeworkRouter

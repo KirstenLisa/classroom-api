@@ -95,6 +95,29 @@ usersRouter
       .catch(next)
   })
 
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { fullname, username, password, class_id, user_type } = req.body
+    const userToUpdate = { fullname, username, password, class_id, user_type }
+
+    const numberOfValues = Object.values(userToUpdate).filter(Boolean).length
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'fullname', 'username', 'password', 'class_id' or 'user_type'`
+        }
+      })
+
+    UsersService.updateUser(
+      req.app.get('db'),
+      req.params.user_id,
+      userToUpdate
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+
 
 
 module.exports = usersRouter
