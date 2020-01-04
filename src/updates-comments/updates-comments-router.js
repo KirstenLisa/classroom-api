@@ -61,12 +61,12 @@ updatesCommentsRouter
   })
 
 updatesCommentsRouter
-  .route('/:commentId')
+  .route('/:pageId')
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
     UpdatesCommentsService.getById(
       knexInstance,
-      req.params.commentId
+      req.params.pageId
     )
       .then(comment => {
         if (!comment) {
@@ -80,7 +80,8 @@ updatesCommentsRouter
       .catch(next)
   })
   .get((req, res, next) => {
-    res.json(serializeUpdateComment(res.comment))
+    console.log(res.comment)
+    res.json(res.comment.map(comment => serializeUpdateComment(comment)))
  
   })
 

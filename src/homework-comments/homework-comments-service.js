@@ -7,9 +7,11 @@ const HomeworkCommentsService = {
     getById(knex, id) {
         return knex.from('homework_comments')
         .select('*')
-        .where('comment_id', id)
-        .first()
-      },
+        .where('page_id', id)
+        
+        
+        
+    },
 
     insertComment(knex, newComment) {
         return knex

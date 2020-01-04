@@ -331,7 +331,7 @@ describe(`PATCH /api/update/:update_id`, () => {
 
 
 
-  describe(`POST /updates`, () => {
+  describe.only(`POST /updates`, () => {
 
     const testTeachers = makeTeachersArray()
     const testClasses = makeClassesArray()
@@ -368,6 +368,9 @@ describe(`PATCH /api/update/:update_id`, () => {
           expect(res.body.content).to.eql(newUpdate.content)
           expect(res.body.class_id).to.eql(newUpdate.class_id)
           expect(res.body.author).to.eql(newUpdate.author)
+          const expected = new Intl.DateTimeFormat('en-US').format(new Date(res.body.date))
+          const actual = new Intl.DateTimeFormat('en-US').format(new Date(newUpdate.date))
+          expect(actual).to.eql(expected)
           expect(res.body).to.have.property('update_id')
           expect(res.headers.location).to.eql(`/api/updates/${res.body.update_id}`)
                 })

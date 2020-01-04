@@ -83,7 +83,8 @@ homeworkCommentsRouter
       .catch(next)
   })
   .get((req, res, next) => {
-    res.json(serializeHomeworkComment(res.comment))
+    console.log(res.comment)
+    res.json(res.comment.map(comment => serializeHomeworkComment(comment)))
  
   })
 

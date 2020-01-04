@@ -15,6 +15,7 @@ const serializeUpdate = update => ({
   date: update.date
 })
 
+
 updatesRouter
   .route('/')
 
@@ -30,6 +31,8 @@ updatesRouter
   .post(jsonBodyParser, (req, res, next) => {
     const { headline, content, class_id, author, date } = req.body
     const newUpdate = { headline, content, class_id, author, date }
+    console.log('REQUEST BODY')
+    console.log(req.body)
 
     for (const [key, value] of Object.entries(newUpdate)) {
       if (value == null) {
@@ -44,6 +47,7 @@ updatesRouter
     newUpdate.class_id = class_id;
     newUpdate.author = author;
     newUpdate.date = date;
+    console.log('newUpdate')
 
     UpdatesService.insertUpdate(
       req.app.get('db'),

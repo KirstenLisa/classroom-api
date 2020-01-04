@@ -7,8 +7,8 @@ const UpdatesCommentsService = {
     getById(knex, id) {
         return knex.from('updates_comments')
         .select('*')
-        .where('comment_id', id)
-        .first()
+        .where('page_id', id)
+        
       },
     
     insertComment(knex, newComment) {

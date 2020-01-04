@@ -19,6 +19,7 @@ const UpdatesService = {
         .then(rows => {
           return rows[0]
           })
+        .then(console.log('insert update'))
         },
 
     deleteUpdate(knex, id) {
