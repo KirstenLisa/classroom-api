@@ -2,7 +2,7 @@ const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
 const xss = require('xss')
-const { makeMaliciousComment, makeUpdatesCommentsArray, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { seedTeachers, seedClassList, seedUsers, seedUpdates, seedUpdatesComments, makeMaliciousComment, makeUpdatesCommentsArray, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Updates-comments service object`, function() {
 
@@ -26,6 +26,30 @@ describe(`Updates-comments service object`, function() {
 
     context('Given there are NO updates in the database', () => {
 
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+      const testUpdates = makeUpdatesArray()
+      
+
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        ); 
+     
+      
+
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/updates-comments')
@@ -42,36 +66,30 @@ describe(`Updates-comments service object`, function() {
       const testUpdates = makeUpdatesArray()
       const testUpdatesComments = makeUpdatesCommentsArray()
 
-      beforeEach('insert data', () => {
-        return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-            .then(() => {
-                return db
-                .into('updates')
-                .insert(testUpdates)
-                .then(() => {
-                    return db
-                    .into('updates_comments')
-                    .insert(testUpdatesComments)
-                })
-            })
-          })
-        })
-      })
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
 
-      it('gets updates-comments from the store', () => {
-        return supertest(app)
-        .get('/api/updates-comments')
-        .expect(200, testUpdatesComments)
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        );  
+
+      beforeEach('insert updates-comments',() => 
+        seedUpdatesComments(db, testUpdatesComments))
+     
+        
+  it('gets updates-comments from the store', () => {
+    return supertest(app)
+      .get('/api/updates-comments')
+      .expect(200, testUpdatesComments)
            })
          })
   
@@ -82,32 +100,29 @@ describe(`Updates-comments service object`, function() {
     const testUpdates = makeUpdatesArray()
     const { maliciousComment, expectedComment } = makeMaliciousComment()
                 
-    beforeEach('insert data', () => {
-      return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-              .into('classroom_users')
-              .insert(testUsers)
-              .then(() => {
-                return db
-                  .into('updates')
-                  .insert(testUpdates)
-                  .then(() => {
-                    return db
-                      .into('updates_comments')
-                      .insert([maliciousComment])
-                        })  
-                      })
-                    })
-                })
-              })  
-                          
+
+    beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+    );
+
+    beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
+    beforeEach('insert updates', () =>
+      seedUpdates(db, testUpdates)
+      );  
+
+    
+    beforeEach('insertupdates-comments',() => 
+      seedUpdatesComments(db, maliciousComment))
+   
+    
+         
     it('removes XSS attack content', () => {
       return supertest(app)
         .get(`/api/updates-comments`)
@@ -123,6 +138,30 @@ describe(`Updates-comments service object`, function() {
   describe('GET/api/updates-comments/:commentId', () => {
 
     context('Given there are NO updates-comments in the database', () => {
+
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+      const testUpdates = makeUpdatesArray()
+
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        );  
+
+    
+      
 
       it(`responds 404 the update doesn't exist`, () => {
         return supertest(app)
@@ -140,32 +179,29 @@ describe(`Updates-comments service object`, function() {
         const testUsers = makeUsersArray()
         const testUpdates = makeUpdatesArray()
         const testUpdatesComments = makeUpdatesCommentsArray()
+        
   
-        beforeEach('insert data', () => {
-          return db
-          .into('teachers')
-          .insert(testTeachers)
-          .then(() => {
-            return db
-            .into('class_list')
-            .insert(testClasses)
-            .then(() => {
-              return db
-              .into('classroom_users')
-              .insert(testUsers)
-              .then(() => {
-                  return db
-                  .into('updates')
-                  .insert(testUpdates)
-                  .then(() => {
-                      return db
-                      .into('updates_comments')
-                      .insert(testUpdatesComments)
-                  })
-              })
-            })
-          })
-        })
+        beforeEach('insert teachers', () =>
+          seedTeachers(db, testTeachers)
+        );
+  
+        beforeEach('insert classes', () =>
+          seedClassList(db, testClasses)
+        );
+  
+        beforeEach('insert users', () =>
+          seedUsers(db, testUsers)
+          );
+  
+        beforeEach('insert updates', () =>
+          seedUpdates(db, testUpdates)
+          );  
+  
+        
+        beforeEach('insertupdates-comments',() => 
+          seedUpdatesComments(db, testUpdatesComments))
+       
+        
     it('responds with 200 and the specified comment', () => {
       const commentId = 2
       const expectedComment = testUpdatesComments[commentId - 1]

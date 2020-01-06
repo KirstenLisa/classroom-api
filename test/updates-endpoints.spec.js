@@ -2,7 +2,7 @@ const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
 const xss = require('xss')
-const { makeAuthHeader, makeMaliciousUpdate, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { seedTeachers, seedClassList, seedUsers, seedUpdates, makeAuthHeader, makeMaliciousUpdate, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Updates service object`, function() {
 
@@ -30,20 +30,18 @@ describe(`Updates service object`, function() {
       const testClasses = makeClassesArray()
       const testUsers = makeUsersArray()
 
-      beforeEach(() =>
-      db.into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-          })
-        })
-      )
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+     );
+
+    beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
 
     it(`responds with 401 'Missing basic token' when no basic token`, () => {
       return supertest(app)
@@ -91,26 +89,22 @@ describe(`Updates service object`, function() {
       const testUsers = makeUsersArray()
       const testUpdates = makeUpdatesArray()
 
-      beforeEach('insert data', () => {
-        return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-            .then(() => {
-                return db
-                .into('updates')
-                .insert(testUpdates)
-            })
-          })
-        })
-      })
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        );  
+
 
       it(`responds with 401 'Missing basic token' when no basic token`, () => {
         return supertest(app)
@@ -157,26 +151,21 @@ describe(`Updates service object`, function() {
       const testUsers = makeUsersArray()
       const { maliciousUpdate, expectedUpdate } = makeMaliciousUpdate()
         
-      beforeEach('insert data', () => {
-        return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-              .then(() => {
-                return db
-                .into('updates')
-                .insert([maliciousUpdate])
-              })
-            })
-        })
-      })  
+      beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+    );
+
+    beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
+    beforeEach('insert updates', () =>
+      seedUpdates(db, maliciousUpdate)
+      );  
                   
       it('removes XSS attack content', () => {
         return supertest(app)
@@ -203,20 +192,17 @@ describe(`Updates service object`, function() {
       const testClasses = makeClassesArray()
       const testUsers = makeUsersArray()
 
-      beforeEach(() =>
-      db.into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-          })
-        })
-      )
+      beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+   );
+
+  beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+  );
+
+  beforeEach('insert users', () =>
+    seedUsers(db, testUsers)
+    );
 
       it(`responds with 401 'Missing basic token' when no basic token`, () => {
         return supertest(app)
@@ -265,26 +251,21 @@ describe(`Updates service object`, function() {
         const testUsers = makeUsersArray()
         const testUpdates = makeUpdatesArray()
   
-        beforeEach('insert data', () => {
-          return db
-          .into('teachers')
-          .insert(testTeachers)
-          .then(() => {
-            return db
-            .into('class_list')
-            .insert(testClasses)
-            .then(() => {
-              return db
-              .into('classroom_users')
-              .insert(testUsers)
-              .then(() => {
-                  return db
-                  .into('updates')
-                  .insert(testUpdates)
-              })
-            })
-          })
-        })
+        beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        );  
 
         it(`responds with 401 'Missing basic token' when no basic token`, () => {
           return supertest(app)
@@ -337,22 +318,19 @@ describe('DELETE /updates/:id', () => {
     const testClasses = makeClassesArray()
     const testUsers = makeUsersArray()
     
+    beforeEach('insert teachers', () =>
+    seedTeachers(db, testTeachers)
+  );
 
-beforeEach('insert data', () => {
-  return db
-    .into('teachers')
-    .insert(testTeachers)
-    .then(() => {
-      return db
-        .into('class_list')
-        .insert(testClasses)
-        .then(() => {
-          return db
-          .into('classroom_users')
-          .insert(testUsers)
-        })
-      })
-    })
+  beforeEach('insert classes', () =>
+    seedClassList(db, testClasses)
+  );
+
+  beforeEach('insert users', () =>
+    seedUsers(db, testUsers)
+    );
+
+  
               
     it(`responds 404 the note doesn't exist`, () => {
       return supertest(app)
@@ -370,27 +348,22 @@ beforeEach('insert data', () => {
         const testUsers = makeUsersArray()
         const testUpdates = makeUpdatesArray()
   
-    beforeEach('insert data', () => {
-      return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-            .into('class_list')
-            .insert(testClasses)
-            .then(() => {
-              return db
-              .into('classroom_users')
-              .insert(testUsers)
-              .then(() => {
-                  return db
-                  .into('updates')
-                  .insert(testUpdates)
-              })
-            })
-          })
-        })
-        
+        beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert updates', () =>
+        seedUpdates(db, testUpdates)
+        );  
+
 
     it('removes the update by ID from the store', () => {
       const idToRemove = 2
@@ -402,6 +375,7 @@ beforeEach('insert data', () => {
                   .then(() =>
                     supertest(app)
                       .get(`/api/updates`)
+                      .set('Authorization', makeAuthHeader(testUsers[0]))
                       .expect(expectedUpdate)
                   )
               })
@@ -418,21 +392,19 @@ describe(`PATCH /api/update/:update_id`, () => {
       const testUsers = makeUsersArray()
       
   
-  beforeEach('insert data', () => {
-    return db
-      .into('teachers')
-      .insert(testTeachers)
-      .then(() => {
-        return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-          })
-        })
-      })
+      beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+    );
+
+    beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
+  
   
     it(`responds with 404`, () => {
       const updateId = 123456
@@ -449,26 +421,21 @@ describe(`PATCH /api/update/:update_id`, () => {
     const testUsers = makeUsersArray()
     const testUpdates = makeUpdatesArray()
     
-    beforeEach('insert data', () => {
-        return db
-          .into('teachers')
-          .insert(testTeachers)
-          .then(() => {
-            return db
-              .into('class_list')
-              .insert(testClasses)
-              .then(() => {
-                return db
-                .into('classroom_users')
-                .insert(testUsers)
-                .then(() => {
-                    return db
-                    .into('updates')
-                    .insert(testUpdates)
-                })
-              })
-            })
-          }) 
+    beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+    );
+
+    beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
+    beforeEach('insert updates', () =>
+      seedUpdates(db, testUpdates)
+      );  
 
   it('responds with 204 and updates the update', () => {
                         
@@ -494,6 +461,7 @@ describe(`PATCH /api/update/:update_id`, () => {
       .then(res =>
         supertest(app)
         .get(`/api/updates/${idToUpdate}`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .expect(expectedUpdate)
       )
     }) 
@@ -534,6 +502,7 @@ describe(`PATCH /api/update/:update_id`, () => {
         .then(res =>
           supertest(app)
           .get(`/api/updates/${idToUpdate}`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(expectedUpdate)
         )
       })
@@ -549,22 +518,20 @@ describe(`PATCH /api/update/:update_id`, () => {
       const testClasses = makeClassesArray()
       const testUsers = makeUsersArray()
       
-  
-  beforeEach('insert data', () => {
-    return db
-      .into('teachers')
-      .insert(testTeachers)
-      .then(() => {
-        return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-          })
-        })
-      })
+    beforeEach('insert teachers', () =>
+      seedTeachers(db, testTeachers)
+    );
+
+    beforeEach('insert classes', () =>
+      seedClassList(db, testClasses)
+    );
+
+    beforeEach('insert users', () =>
+      seedUsers(db, testUsers)
+      );
+
+
+
     it(`creates an update, responding with 201 and the new update`, function() {
       this.retries(3)
       const newUpdate = {
@@ -595,6 +562,7 @@ describe(`PATCH /api/update/:update_id`, () => {
             .then(postRes =>
               supertest(app)
               .get(`/api/updates/${postRes.body.update_id}`)
+              .set('Authorization', makeAuthHeader(testUsers[0]))
               .expect(postRes.body)
                 )
             })

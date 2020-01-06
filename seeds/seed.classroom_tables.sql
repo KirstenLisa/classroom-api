@@ -32,18 +32,18 @@ VALUES
 
 INSERT INTO classroom_users(fullname, username, password, class_id, user_type)
 VALUES
-('Guy Inkognito', 'GuyI', 'GuyInkognito!123', 1, 'parent'),
-('Susi Sonnenschein', 'Susi', 'SusiSonne!123', 2, 'student'),
-('Max Mustermann', 'Maximaus', 'MaxM!123', 3, 'parent'),
-('Else Kling', 'Klingtgut', 'KlingElse!123', 4, 'student'),
-('Guido Kretschmer', 'Maria', 'GuidO!123', 5, 'parent'),
-('Kai Pflaume', 'Plaumenmus86', 'KaI!123', 6, 'student'),
-('Edna Krabappel', 'E_Krabappel', 'Password!123', 1, 'teacher'),
-('Seymour Skinner', 'S_Skinner', 'Password!123', 2, 'teacher'),
-('Ned Flanders', 'N_Flanders', 'Password!123', 3, 'teacher'),
-('Jonas Bergstrom', 'J_Bergstrom', 'Password!123', 4, 'teacher'),
-('Selma Hoover', 'S_Hoover', 'Password!123', 5, 'teacher'),
-('Antje Pommelhorst', 'A_Pommelhorst', 'Password!123', 6, 'teacher');
+('Guy Inkognito', 'GuyI',  '$2a$12$29Dh0KjocX4MlV/XL1z6Iug5Sqa0TWRLvqJ4K8oPPa6ap2ZzrG.BO', 1, 'parent'),
+('Susi Sonnenschein', 'Susi', '$2a$12$kz1RKDuyrQIY8JsfxzY18.9CWA9sMzG1k9W3SOzSGe6zttdn3GtKO', 2, 'student'),
+('Max Mustermann', 'Maximaus', '$2a$12$saXYeqF8kCW39.4FCkGJyOEPtL18ei.ZkbxbH3U.6w8ZTtjY2Wb6C', 3, 'parent'),
+('Else Kling', 'Klingtgut', '$2a$12$dRUJBdNHaeqi7u.FW6L4ieWyRTvNXSWgA0PKhyS7Dc.3alOwAFc7O', 4, 'student'),
+('Guido Kretschmer', 'Maria', '$2a$12$bRcY6Sq7vJ8i12.DkaeUNuBtVzMm3ED80QSOvat1SByFyNpbCNtSy', 5, 'parent'),
+('Kai Pflaume', 'Plaumenmus86', '$2a$12$VtUvgSFSmsGdIlh3uuWmUO9.ZVEAZuhIBTtwVv3sPeBg6gzbCkp0S', 6, 'student'),
+('Edna Krabappel', 'E_Krabappel', '$2a$12$eVD0dd6RkawsuFPmV2Vk9OhODscKyL9b8Y7MPcQpVAzHw0gSCrp0m', 1, 'teacher'),
+('Seymour Skinner', 'S_Skinner', '$2a$12$c3x5t0CjS6WJw4XDXNmSsulCWjisWaCn7LRehWgJLiKzOw23jMQdW', 2, 'teacher'),
+('Ned Flanders', 'N_Flanders', '$2a$12$IKHqvRGNW.8aRehq2/BW9.Wr7VThMSnHb9dcLvKyGVWLwkr9JyryC', 3, 'teacher'),
+('Jonas Bergstrom', 'J_Bergstrom', '$2a$12$o.cuJ2GivYGQ.vpukyBTgeuMlZAC.eRZbEHRFbkhIAwvhGC5zX3Ia', 4, 'teacher'),
+('Selma Hoover', 'S_Hoover', '$2a$12$.qH/HdFS5dLmn6/8nyYtS.CxKzhooYeUj4xJv5bAM30rMQwL3YqG.', 5, 'teacher'),
+('Antje Pommelhorst', 'A_Pommelhorst', '$2a$12$GyUo3.BCPlM8bhYoDeJA6.gHeis5DdpAzNWL42kow3ZyiUsGD2sUq', 6, 'teacher');
 
 INSERT INTO updates(update_id, headline, content, class_id, author)
 VALUES

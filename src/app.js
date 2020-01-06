@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
+const authRouter = require('./auth/auth-router')
 const teachersRouter = require('./teachers/teachers-router')
 const classesRouter = require('./classes/classes-router')
 const usersRouter = require('./users/users-router')
@@ -11,6 +12,7 @@ const homeworkRouter = require('./homework/homework-router')
 const updatesRouter = require('./updates/updates-router')
 const updatesCommentsRouter = require('./updates-comments/updates-comments-router')
 const homeworkCommentsRouter = require('./homework-comments/homework-comments-router')
+
 
 const app = express()
 
@@ -26,6 +28,7 @@ app.get('/', (req, res) => {
   res.send('Hello, classroom!')
 })
 
+app.use('/api/auth', authRouter)
 app.use('/api/teachers', teachersRouter)
 app.use('/api/classes', classesRouter)
 app.use('/api/users', usersRouter)
@@ -33,6 +36,7 @@ app.use('/api/homework', homeworkRouter)
 app.use('/api/updates', updatesRouter)
 app.use('/api/updates-comments', updatesCommentsRouter)
 app.use('/api/homework-comments', homeworkCommentsRouter)
+
 
 
 

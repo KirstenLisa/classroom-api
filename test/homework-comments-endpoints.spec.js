@@ -1,8 +1,7 @@
 const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
-const xss = require('xss')
-const { makeMaliciousComment, makeHomeworkCommentsArray, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { seedTeachers, seedClassList, seedUsers, seedHomework, seedHomeworkComments, makeMaliciousComment, makeHomeworkCommentsArray, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Homework-comments service object`, function() {
 
@@ -42,31 +41,27 @@ describe(`Homework-comments service object`, function() {
       const testHomework = makeHomeworkArray()
       const testHomeworkComments = makeHomeworkCommentsArray()
 
-      beforeEach('insert data', () => {
-        return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-          .into('class_list')
-          .insert(testClasses)
-          .then(() => {
-            return db
-            .into('classroom_users')
-            .insert(testUsers)
-            .then(() => {
-                return db
-                .into('homework')
-                .insert(testHomework)
-                .then(() => {
-                    return db
-                    .into('homework_comments')
-                    .insert(testHomeworkComments)
-                })
-            })
-          })
-        })
-      })
+
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+
+      beforeEach('insert homework', () =>
+        seedHomework(db, testHomework)
+        );  
+      
+      beforeEach('insert homework-comments',() => 
+        seedHomeworkComments(db, testHomeworkComments))
+     
+      
 
       it('gets homework-comments from the store', () => {
         return supertest(app)
