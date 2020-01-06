@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const xss = require('xss')
 const HomeworkService = require('./homework-service')
+const { requireAuth } = require('../middleware/basic-auth')
 
 const homeworkRouter = express.Router()
 const jsonBodyParser = express.json()
@@ -19,6 +20,7 @@ const serializeHomework = homework => ({
 
 homeworkRouter
   .route('/')
+  .all(requireAuth)
   .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     HomeworkService.getAllHomework(knexInstance)
@@ -27,7 +29,7 @@ homeworkRouter
     })
     .catch(next)
   })
-  .post(jsonBodyParser, (req, res, next) => {
+  .post(requireAuth, jsonBodyParser, (req, res, next) => {
     const { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id } = req.body
     const newHomework = { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id }
 
@@ -63,7 +65,8 @@ homeworkRouter
 
 
 homeworkRouter
-.route('/:id')
+  .route('/:id')
+  .all(requireAuth)
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
     HomeworkService.getById(
@@ -96,7 +99,7 @@ homeworkRouter
       .catch(next)
   })
 
-  .patch(jsonBodyParser, (req, res, next) => {
+  .patch(requireAuth, jsonBodyParser, (req, res, next) => {
     const { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id } = req.body
     const homeworkToUpdate = { homework_id, subject, homework, due_date, teacher_id, teacher_name, class_id }
 

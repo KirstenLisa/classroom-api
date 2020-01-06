@@ -64,12 +64,12 @@ homeworkCommentsRouter
 
 
 homeworkCommentsRouter
-  .route('/:commentId')
+  .route('/:pageId')
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
     HomeworkCommentsService.getById(
       knexInstance,
-      req.params.commentId
+      req.params.pageId
     )
       .then(comment => {
         if (!comment) {
@@ -83,7 +83,6 @@ homeworkCommentsRouter
       .catch(next)
   })
   .get((req, res, next) => {
-    console.log(res.comment)
     res.json(res.comment.map(comment => serializeHomeworkComment(comment)))
  
   })

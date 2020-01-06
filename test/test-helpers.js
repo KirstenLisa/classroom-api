@@ -166,7 +166,7 @@ function makeHomeworkCommentsArray() {
          "user_name": "test-username-1",
          "date": "2020-01-10T16:28:32.615Z",
          "user_id": 1,
-         "page_id": 11
+         "page_id": 1
       },
       {
          "comment_id": 2,
@@ -174,7 +174,7 @@ function makeHomeworkCommentsArray() {
          "user_name": "test-username-2",
          "date": "2020-01-11T16:28:32.615Z",
          "user_id": 2,
-         "page_id": 12
+         "page_id": 2
       },
       {
          "comment_id": 3,
@@ -182,7 +182,7 @@ function makeHomeworkCommentsArray() {
          "user_name": "test-username-3",
          "date": "2020-01-12T16:28:32.615Z",
          "user_id": 3,
-         "page_id": 13
+         "page_id": 3
       },
    ]
 }
@@ -280,6 +280,12 @@ function makeMaliciousComment() {
       }
       return {maliciousComment, expectedComment}
       }
+   
+
+   function makeAuthHeader(user) {
+      const token = Buffer.from(`${user.username}:${user.password}`).toString('base64')
+         return `Basic ${token}`
+      }
 
 module.exports = { 
    makeTeachersArray, 
@@ -292,4 +298,5 @@ module.exports = {
    makeMaliciousUser,
    makeMaliciousUpdate,
    makeMaliciousHomework,
-   makeMaliciousComment }
+   makeMaliciousComment,
+   makeAuthHeader }

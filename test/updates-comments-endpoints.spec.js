@@ -118,7 +118,7 @@ describe(`Updates-comments service object`, function() {
                       })
                     })
         
-    
+                  })
 
   describe('GET/api/updates-comments/:commentId', () => {
 
@@ -175,70 +175,8 @@ describe(`Updates-comments service object`, function() {
          })
        })
       })
-      })
-
-
-  describe('DELETE /updates-comments/:id', () => {
-        
-    context(`Given no comments`, () => {
-                          
-      it(`responds 404 the comment doesn't exist`, () => {
-        return supertest(app)
-          .delete(`/api/updates-comments/123`)
-          .expect(404, {
-            error: { message: `Comment doesn't exist` }
-                              })
-                          })
-                        })
-                  
-    context('Given there ARE comments in the database', () => {
-      const testTeachers = makeTeachersArray()
-      const testClasses = makeClassesArray()
-      const testUsers = makeUsersArray()
-      const testUpdates = makeUpdatesArray()
-      const testUpdatesComments = makeUpdatesCommentsArray()
-  
-        beforeEach('insert data', () => {
-          return db
-          .into('teachers')
-          .insert(testTeachers)
-          .then(() => {
-            return db
-            .into('class_list')
-            .insert(testClasses)
-            .then(() => {
-              return db
-              .into('classroom_users')
-              .insert(testUsers)
-              .then(() => {
-                  return db
-                  .into('updates')
-                  .insert(testUpdates)
-                  .then(() => {
-                      return db
-                      .into('updates_comments')
-                      .insert(testUpdatesComments)
-                  })
-              })
-            })
-          })
-        })
-                    
-            
-    it('removes the comments by ID from the store', () => {
-      const idToRemove = 2
-      const expectedComment = testUpdatesComments.filter(comment => comment.comment_id !== idToRemove)
-        return supertest(app)
-          .delete(`/api/updates-comments/${idToRemove}`)
-          .expect(204)
-          .then(() =>
-            supertest(app)
-            .get(`/api/updates-comments`)
-            .expect(expectedComment)
-                              )
-                          })
-                        })
-                      })            
+      
+                           
             
 
   describe(`POST /updates-comments`, () => {

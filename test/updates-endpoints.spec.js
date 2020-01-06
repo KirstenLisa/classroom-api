@@ -2,7 +2,7 @@ const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
 const xss = require('xss')
-const { makeMaliciousUpdate, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { makeAuthHeader, makeMaliciousUpdate, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Updates service object`, function() {
 
@@ -26,9 +26,59 @@ describe(`Updates service object`, function() {
 
     context('Given there are NO updates in the database', () => {
 
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+
+      beforeEach(() =>
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
+
+    it(`responds with 401 'Missing basic token' when no basic token`, () => {
+      return supertest(app)
+        .get(`/api/updates`)
+        .expect(401, { error: `Missing basic token` })
+           })
+
+    it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+      const userNoCreds = { username: '', password: '' }
+        return supertest(app)
+          .get(`/api/updates`)
+          .set('Authorization', makeAuthHeader(userNoCreds))
+          .expect(401, { error: `Unauthorized request` })
+          })
+
+    it(`responds 401 'Unauthorized request' when invalid user`, () => {
+      const userInvalidCreds = { username: 'user-not', password: 'existy' }
+        return supertest(app)
+          .get(`/api/updates`)
+          .set('Authorization', makeAuthHeader(userInvalidCreds))
+          .expect(401, { error: `Unauthorized request` })
+          })
+
+    it(`responds 401 'Unauthorized request' when invalid password`, () => {
+      const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+        return supertest(app)
+          .get(`/api/updates`)
+          .set('Authorization', makeAuthHeader(userInvalidPass))
+          .expect(401, { error: `Unauthorized request` })
+          })
+
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/updates')
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(200, [])
           })
 
@@ -62,9 +112,40 @@ describe(`Updates service object`, function() {
         })
       })
 
+      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+        return supertest(app)
+          .get(`/api/updates`)
+          .expect(401, { error: `Missing basic token` })
+             })
+  
+      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+        const userNoCreds = { username: '', password: '' }
+          return supertest(app)
+            .get(`/api/updates`)
+            .set('Authorization', makeAuthHeader(userNoCreds))
+            .expect(401, { error: `Unauthorized request` })
+            })
+  
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+          return supertest(app)
+            .get(`/api/updates`)
+            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .expect(401, { error: `Unauthorized request` })
+            })
+  
+      it(`responds 401 'Unauthorized request' when invalid password`, () => {
+        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+          return supertest(app)
+            .get(`/api/updates`)
+            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .expect(401, { error: `Unauthorized request` })
+            })
+
       it('gets updates from the store', () => {
         return supertest(app)
         .get('/api/updates')
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .expect(200, testUpdates)
            })
          })
@@ -100,6 +181,7 @@ describe(`Updates service object`, function() {
       it('removes XSS attack content', () => {
         return supertest(app)
           .get(`/api/updates`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(200)
           .expect(res => {
             expect(res.body[0].headline).to.eql(expectedUpdate.headline)
@@ -108,6 +190,7 @@ describe(`Updates service object`, function() {
                   })
               })
             })
+          })
 
 
 
@@ -116,9 +199,59 @@ describe(`Updates service object`, function() {
 
     context('Given there are NO updates in the database', () => {
 
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+
+      beforeEach(() =>
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
+
+      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+        return supertest(app)
+          .get(`/api/updates/123`)
+          .expect(401, { error: `Missing basic token` })
+             })
+  
+      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+        const userNoCreds = { username: '', password: '' }
+          return supertest(app)
+            .get(`/api/updates/123`)
+            .set('Authorization', makeAuthHeader(userNoCreds))
+            .expect(401, { error: `Unauthorized request` })
+            })
+  
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+          return supertest(app)
+            .get(`/api/updates/123`)
+            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .expect(401, { error: `Unauthorized request` })
+            })
+  
+      it(`responds 401 'Unauthorized request' when invalid password`, () => {
+        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+          return supertest(app)
+            .get(`/api/updates/123`)
+            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .expect(401, { error: `Unauthorized request` })
+            })
+
       it(`responds 404 the update doesn't exist`, () => {
         return supertest(app)
           .get(`/api/updates/123`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(404, {
           error: { message: `Update doesn't exist` }
                })
@@ -153,25 +286,78 @@ describe(`Updates service object`, function() {
           })
         })
 
+        it(`responds with 401 'Missing basic token' when no basic token`, () => {
+          return supertest(app)
+            .get(`/api/updates/1`)
+            .expect(401, { error: `Missing basic token` })
+               })
+    
+        it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+          const userNoCreds = { username: '', password: '' }
+            return supertest(app)
+              .get(`/api/updates/1`)
+              .set('Authorization', makeAuthHeader(userNoCreds))
+              .expect(401, { error: `Unauthorized request` })
+              })
+    
+        it(`responds 401 'Unauthorized request' when invalid user`, () => {
+          const userInvalidCreds = { username: 'user-not', password: 'existy' }
+            return supertest(app)
+              .get(`/api/updates/1`)
+              .set('Authorization', makeAuthHeader(userInvalidCreds))
+              .expect(401, { error: `Unauthorized request` })
+              })
+    
+        it(`responds 401 'Unauthorized request' when invalid password`, () => {
+          const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+            return supertest(app)
+              .get(`/api/updates/1`)
+              .set('Authorization', makeAuthHeader(userInvalidPass))
+              .expect(401, { error: `Unauthorized request` })
+              })
+
     it('responds with 200 and the specified update', () => {
       const updateId = 2
       const expectedUpdate = testUpdates[updateId - 1]
         return supertest(app)
           .get(`/api/updates/${updateId}`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(200, expectedUpdate)
          })
        })
       })
-      })
+      
 
 
 describe('DELETE /updates/:id', () => {
         
   context(`Given no updates`, () => {
+
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    
+
+beforeEach('insert data', () => {
+  return db
+    .into('teachers')
+    .insert(testTeachers)
+    .then(() => {
+      return db
+        .into('class_list')
+        .insert(testClasses)
+        .then(() => {
+          return db
+          .into('classroom_users')
+          .insert(testUsers)
+        })
+      })
+    })
               
     it(`responds 404 the note doesn't exist`, () => {
       return supertest(app)
         .delete(`/api/updates/123`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .expect(404, {
           error: { message: `Update doesn't exist` }
                   })
@@ -179,7 +365,7 @@ describe('DELETE /updates/:id', () => {
             })
       
   context('Given there ARE updates in the database', () => {
-    const testTeachers = makeTeachersArray()
+        const testTeachers = makeTeachersArray()
         const testClasses = makeClassesArray()
         const testUsers = makeUsersArray()
         const testUpdates = makeUpdatesArray()
@@ -211,6 +397,7 @@ describe('DELETE /updates/:id', () => {
       const expectedUpdate = testUpdates.filter(update => update.update_id !== idToRemove)
                 return supertest(app)
                   .delete(`/api/updates/${idToRemove}`)
+                  .set('Authorization', makeAuthHeader(testUsers[0]))
                   .expect(204)
                   .then(() =>
                     supertest(app)
@@ -225,11 +412,33 @@ describe('DELETE /updates/:id', () => {
           
 describe(`PATCH /api/update/:update_id`, () => {
   context(`Given no updates`, () => {
+
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+      
+  
+  beforeEach('insert data', () => {
+    return db
+      .into('teachers')
+      .insert(testTeachers)
+      .then(() => {
+        return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      })
   
     it(`responds with 404`, () => {
       const updateId = 123456
       return supertest(app)
       .patch(`/api/updates/${updateId}`)
+      .set('Authorization', makeAuthHeader(testUsers[0]))
       .expect(404, { error: { message: `Update doesn't exist` } })
       })
     })
@@ -261,7 +470,7 @@ describe(`PATCH /api/update/:update_id`, () => {
             })
           }) 
 
-  it('responds with 204 and updates the updates', () => {
+  it('responds with 204 and updates the update', () => {
                         
     const idToUpdate = 2
     const updatedUpdate = {
@@ -279,6 +488,7 @@ describe(`PATCH /api/update/:update_id`, () => {
                            
     return supertest(app)
       .patch(`/api/updates/${idToUpdate}`)
+      .set('Authorization', makeAuthHeader(testUsers[0]))
       .send(updatedUpdate)
       .expect(204)
       .then(res =>
@@ -293,6 +503,7 @@ describe(`PATCH /api/update/:update_id`, () => {
       const idToUpdate = 2
         return supertest(app)
         .patch(`/api/updates/${idToUpdate}`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .send({ irrelevantField: 'foo' })
         .expect(400, {
             error: {
@@ -314,6 +525,7 @@ describe(`PATCH /api/update/:update_id`, () => {
                             
       return supertest(app)
         .patch(`/api/updates/${idToUpdate}`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .send({
             ...updatedUpdate,
             fieldToIgnore: 'should not be in GET response'
@@ -331,23 +543,28 @@ describe(`PATCH /api/update/:update_id`, () => {
 
 
 
-  describe.only(`POST /updates`, () => {
+  describe(`POST /updates`, () => {
 
-    const testTeachers = makeTeachersArray()
-    const testClasses = makeClassesArray()
-
-    beforeEach('insert data', () => {
-      return db
-        .into('teachers')
-        .insert(testTeachers)
-        .then(() => {
-          return db
-            .into('class_list')
-            .insert(testClasses)
-            
+      const testTeachers = makeTeachersArray()
+      const testClasses = makeClassesArray()
+      const testUsers = makeUsersArray()
+      
+  
+  beforeEach('insert data', () => {
+    return db
+      .into('teachers')
+      .insert(testTeachers)
+      .then(() => {
+        return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
         })
       })
-        
     it(`creates an update, responding with 201 and the new update`, function() {
       this.retries(3)
       const newUpdate = {
@@ -361,6 +578,7 @@ describe(`PATCH /api/update/:update_id`, () => {
 
       return supertest(app)
         .post('/api/updates')
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .send(newUpdate)
         .expect(201)
         .expect(res => {
@@ -396,6 +614,7 @@ describe(`PATCH /api/update/:update_id`, () => {
             
         return supertest(app)
           .post('/api/updates')
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .send(newUpdate)
           .expect(400, {
             error: { message: `Missing '${field}' in request body` }
@@ -407,6 +626,7 @@ describe(`PATCH /api/update/:update_id`, () => {
         const { maliciousUpdate, expectedUpdate } = makeMaliciousUpdate();
           return supertest(app)
             .post('/api/updates')
+            .set('Authorization', makeAuthHeader(testUsers[0]))
             .send(maliciousUpdate)
             .expect(201)
             .expect(res => {

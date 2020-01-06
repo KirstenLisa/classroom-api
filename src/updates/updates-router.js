@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const xss = require('xss')
 const UpdatesService = require('./updates-service')
+const { requireAuth } = require('../middleware/basic-auth')
 
 const updatesRouter = express.Router()
 const jsonBodyParser = express.json()
@@ -18,7 +19,7 @@ const serializeUpdate = update => ({
 
 updatesRouter
   .route('/')
-
+  .all(requireAuth)
   .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     UpdatesService.getAllUpdates(knexInstance)
@@ -28,7 +29,7 @@ updatesRouter
     .catch(next)
   })
 
-  .post(jsonBodyParser, (req, res, next) => {
+  .post(requireAuth, jsonBodyParser, (req, res, next) => {
     const { headline, content, class_id, author, date } = req.body
     const newUpdate = { headline, content, class_id, author, date }
     console.log('REQUEST BODY')
@@ -64,6 +65,7 @@ updatesRouter
 
 updatesRouter
   .route('/:updateId')
+  .all(requireAuth)
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
     UpdatesService.getById(
@@ -96,7 +98,7 @@ updatesRouter
       .catch(next)
   })
 
-  .patch(jsonBodyParser, (req, res, next) => {
+  .patch(requireAuth, jsonBodyParser, (req, res, next) => {
     const { headline, content, class_id, author, date } = req.body
     const updateToUpdate = { headline, content, class_id, author, date }
 

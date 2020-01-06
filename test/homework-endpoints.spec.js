@@ -2,11 +2,17 @@ const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
 const xss = require('xss')
-const { makeMaliciousHomework, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { makeAuthHeader, makeMaliciousHomework, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Homework service object`, function() {
 
     let db
+
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testHomework = makeHomeworkArray()
+
 
     before(() => {
       db = knex({
@@ -26,13 +32,63 @@ describe(`Homework service object`, function() {
 
     context('Given there is NO homework in the database', () => {
 
+      beforeEach(() =>
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
+    
+
+     
+      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+        return supertest(app)
+          .get(`/api/homework`)
+          .expect(401, { error: `Missing basic token` })
+           })
+
+      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+        const userNoCreds = { username: '', password: '' }
+          return supertest(app)
+            .get(`/api/homework`)
+            .set('Authorization', makeAuthHeader(userNoCreds))
+            .expect(401, { error: `Unauthorized request` })
+            })
+
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+          return supertest(app)
+            .get(`/api/homework`)
+            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .expect(401, { error: `Unauthorized request` })
+          })
+
+      it(`responds 401 'Unauthorized request' when invalid password`, () => {
+        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+          return supertest(app)
+            .get(`/api/homework/1`)
+            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .expect(401, { error: `Unauthorized request` })
+          })
+
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/homework')
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(200, [])
           })
-
-      })
+    
+      
+          })
+      
 
     context('Given there is homework in the database', () => {
 
@@ -62,14 +118,55 @@ describe(`Homework service object`, function() {
         })
       })
 
-      it('gets updates from the store', () => {
+    it(`responds with 401 'Missing basic token' when no basic token`, () => {
+      return supertest(app)
+        .get(`/api/homework`)
+        .expect(401, { error: `Missing basic token` })
+      })
+    
+    it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+      const userNoCreds = { username: '', password: '' }
+        return supertest(app)
+          .get(`/api/homework`)
+          .set('Authorization', makeAuthHeader(userNoCreds))
+          .expect(401, { error: `Unauthorized request` })
+        })
+    
+    it(`responds 401 'Unauthorized request' when invalid user`, () => {
+      const userInvalidCreds = { username: 'user-not', password: 'existy' }
+        return supertest(app)
+          .get(`/api/homework`)
+          .set('Authorization', makeAuthHeader(userInvalidCreds))
+          .expect(401, { error: `Unauthorized request` })
+      })
+    
+    it(`responds 401 'Unauthorized request' when invalid password`, () => {
+      const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+        return supertest(app)
+          .get(`/api/homework/1`)
+          .set('Authorization', makeAuthHeader(userInvalidPass))
+          .expect(401, { error: `Unauthorized request` })
+      })
+      
+    it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+      const userNoCreds = { username: '', password: '' }
+        return supertest(app)
+          .get(`/api/homework`)
+          .set('Authorization', makeAuthHeader(userNoCreds))
+          .expect(401, { error: `Unauthorized request` })
+      })
+      
+          
+
+      it('gets homework from the store', () => {
         return supertest(app)
         .get('/api/homework')
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .expect(200, testHomework)
            })
          })
   
-         context(`Given an XSS attack update`, () => {
+         context(`Given an XSS attack homework`, () => {
           const testTeachers = makeTeachersArray()
           const testClasses = makeClassesArray()
           const testUsers = makeUsersArray()
@@ -96,24 +193,72 @@ describe(`Homework service object`, function() {
             })
           })  
                       
-          it('removes XSS attack content', () => {
-            return supertest(app)
-              .get(`/api/homework`)
-              .expect(200)
-              .expect(res => {
-                expect(res.body[0].homework).to.eql(expectedHomework.homework)
-                      })
-                  })
-                })
+    it('removes XSS attack content', () => {
+      return supertest(app)
+        .get(`/api/homework`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
+        .expect(200)
+        .expect(res => {
+          expect(res.body[0].homework).to.eql(expectedHomework.homework)
+          })
+        })
+      })
+    })
     
 
   describe('GET/api/homework/:homeworkId', () => {
 
     context('Given there is NO homework in the database', () => {
 
+      beforeEach(() =>
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
+
+      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+        return supertest(app)
+          .get(`/api/homework/123`)
+          .expect(401, { error: `Missing basic token` })
+           })
+
+      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+        const userNoCreds = { username: '', password: '' }
+          return supertest(app)
+            .get(`/api/homework/123`)
+                .set('Authorization', makeAuthHeader(userNoCreds))
+                .expect(401, { error: `Unauthorized request` })
+                })
+    
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+          return supertest(app)
+            .get(`/api/homework/123`)
+            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .expect(401, { error: `Unauthorized request` })
+              })
+    
+      it(`responds 401 'Unauthorized request' when invalid password`, () => {
+        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+          return supertest(app)
+            .get(`/api/homework/123`)
+            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .expect(401, { error: `Unauthorized request` })
+              })
+
       it(`responds 404 the homework doesn't exist`, () => {
         return supertest(app)
           .get(`/api/homework/123`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(404, {
           error: { message: `Homework doesn't exist` }
                })
@@ -136,35 +281,93 @@ describe(`Homework service object`, function() {
             .into('class_list')
             .insert(testClasses)
             .then(() => {
-                return db
-                .into('homework')
-                .insert(testHomework)
+              return db
+              .into('classroom_users')
+              .insert(testUsers)
+              .then(() => {
+                  return db
+                  .into('homework')
+                  .insert(testHomework)
               })
             })
           })
+        })
+    
+        it(`responds with 401 'Missing basic token' when no basic token`, () => {
+          return supertest(app)
+            .get(`/api/homework/1`)
+            .expect(401, { error: `Missing basic token` })
+             })
+  
+        it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
+          const userNoCreds = { username: '', password: '' }
+            return supertest(app)
+              .get(`/api/homework/1`)
+                  .set('Authorization', makeAuthHeader(userNoCreds))
+                  .expect(401, { error: `Unauthorized request` })
+                  })
+      
+        it(`responds 401 'Unauthorized request' when invalid user`, () => {
+          const userInvalidCreds = { username: 'user-not', password: 'existy' }
+            return supertest(app)
+              .get(`/api/homework/1`)
+              .set('Authorization', makeAuthHeader(userInvalidCreds))
+              .expect(401, { error: `Unauthorized request` })
+                })
+      
+        it(`responds 401 'Unauthorized request' when invalid password`, () => {
+          const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
+            return supertest(app)
+              .get(`/api/homework/1`)
+              .set('Authorization', makeAuthHeader(userInvalidPass))
+              .expect(401, { error: `Unauthorized request` })
+                })
     
 
-    it('responds with 200 and the specified user', () => {
+    it('responds with 200 and the specified homework', () => {
       const homeworkId = 2
       const expectedHomework = testHomework[homeworkId - 1]
         return supertest(app)
           .get(`/api/homework/${homeworkId}`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(200, expectedHomework)
          })
        })
       })
-      })
-
+    
+      
+    
 
 describe('DELETE /homework/:id', () => {
         
   context(`Given no homework`, () => {
+
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+
+    beforeEach(() => 
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
+
                     
-          it(`responds 404 the homework doesn't exist`, () => {
-            return supertest(app)
-              .delete(`/api/homework/123`)
-              .expect(404, {
-                error: { message: `Homework doesn't exist` }
+    it(`responds 404 the homework doesn't exist`, () => {
+      return supertest(app)
+        .delete(`/api/homework/123`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
+        .expect(404, {
+          error: { message: `Homework doesn't exist` }
                         })
                     })
                   })
@@ -175,8 +378,8 @@ describe('DELETE /homework/:id', () => {
     const testUsers = makeUsersArray()
     const testHomework = makeHomeworkArray()
         
-    beforeEach('insert data', () => {
-      return db
+    beforeEach('insert data', () => 
+      db
         .into('teachers')
         .insert(testTeachers)
         .then(() => {
@@ -194,7 +397,7 @@ describe('DELETE /homework/:id', () => {
                     })
                   })
                 })
-              })
+              )
               
       
     it('removes the homework by ID from the store', () => {
@@ -202,6 +405,7 @@ describe('DELETE /homework/:id', () => {
       const expectedHomework = testHomework.filter(homework => homework.id !== idToRemove)
         return supertest(app)
           .delete(`/api/homework/${idToRemove}`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(204)
           .then(() =>
             supertest(app)
@@ -215,11 +419,31 @@ describe('DELETE /homework/:id', () => {
             
 describe(`PATCH /api/homework/:homework_id`, () => {
   context(`Given no homework`, () => {
+
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+
+    beforeEach(() => 
+      db.into('teachers')
+        .insert(testTeachers)
+        .then(() => {
+          return db
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
+        })
+      )
   
     it(`responds with 404`, () => {
       const homeworkId = 123456
       return supertest(app)
       .patch(`/api/homework/${homeworkId}`)
+      .set('Authorization', makeAuthHeader(testUsers[0]))
       .expect(404, { error: { message: `Homework doesn't exist` } })
       })
     })
@@ -268,11 +492,12 @@ describe(`PATCH /api/homework/:homework_id`, () => {
       ...testHomework[idToUpdate - 1],
       ...updatedHomework
                   }
-
-    console.log(idToUpdate)
+    console.log('TEST USER')
+    console.log(makeAuthHeader(testUsers[0]))
                            
     return supertest(app)
       .patch(`/api/homework/${idToUpdate}`)
+      .set('Authorization', makeAuthHeader(testUsers[0]))
       .send(updatedHomework)
       .expect(204)
       .then(res =>
@@ -287,6 +512,7 @@ describe(`PATCH /api/homework/:homework_id`, () => {
       const idToUpdate = 2
         return supertest(app)
         .patch(`/api/homework/${idToUpdate}`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .send({ irrelevantField: 'foo' })
         .expect(400, {
             error: {
@@ -308,6 +534,7 @@ describe(`PATCH /api/homework/:homework_id`, () => {
                             
       return supertest(app)
         .patch(`/api/homework/${idToUpdate}`)
+        .set('Authorization', makeAuthHeader(testUsers[0]))
         .send({
             ...updatedHomework,
             fieldToIgnore: 'should not be in GET response'
@@ -326,20 +553,27 @@ describe(`PATCH /api/homework/:homework_id`, () => {
 
     const testTeachers = makeTeachersArray()
     const testClasses = makeClassesArray()
-              
-    beforeEach('insert data', () => {
-      return db
-        .into('teachers')
+    const testUsers = makeUsersArray()
+
+    beforeEach(() => 
+      db.into('teachers')
         .insert(testTeachers)
         .then(() => {
           return db
-            .into('class_list')
-            .insert(testClasses)
+          .into('class_list')
+          .insert(testClasses)
+          .then(() => {
+            return db
+            .into('classroom_users')
+            .insert(testUsers)
+          })
         })
-      })
-                      
+      )
+
       it(`creates a homework, responding with 201 and the new homework`, function() {
         this.retries(3)
+        console.log('TEST USER')
+        console.log(makeAuthHeader(testUsers[0]))
         const newHomework = {
           homework_id: 11,
           subject: 'Math',
@@ -349,9 +583,11 @@ describe(`PATCH /api/homework/:homework_id`, () => {
           teacher_name: "test-teacher-name-1",
           class_id: 2
         }
+        
               
         return supertest(app)
           .post('/api/homework')
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .send(newHomework)
           .expect(201)
           .expect(res => {
@@ -391,6 +627,7 @@ describe(`PATCH /api/homework/:homework_id`, () => {
                           
         return supertest(app)
           .post('/api/homework')
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .send(newHomework)
           .expect(400, {
             error: { message: `Missing '${field}' in request body` }
@@ -402,6 +639,7 @@ describe(`PATCH /api/homework/:homework_id`, () => {
         const { maliciousHomework, expectedHomework } = makeMaliciousHomework();
           return supertest(app)
             .post('/api/homework')
+            .set('Authorization', makeAuthHeader(testUsers[0]))
             .send(maliciousHomework)
             .expect(201)
             .expect(res => {
