@@ -1,7 +1,6 @@
 const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
-const xss = require('xss')
 const { seedTeachers, seedClassList, seedUsers, seedUpdates, makeAuthHeader, makeMaliciousUpdate, makeUpdatesArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Updates service object`, function() {

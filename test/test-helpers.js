@@ -284,39 +284,6 @@ function makeMaliciousComment() {
       return {maliciousComment, expectedComment}
       }
 
-// function cleanTables(db) {
-//    return db.transaction(trx =>
-//       trx.raw(
-//          `TRUNCATE
-//             teachers,
-//             class_list,
-//             classroom_users,
-//             updates,
-//             homework,
-//             updates_comments,
-//             homework_comments`
-//            )
-//       .then(() =>
-//          Promise.all([
-//             trx.raw(`ALTER SEQUENCE teachers_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE class_list_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE classroom_users_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE updates_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE homework_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE updates_comments_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`ALTER SEQUENCE homework_comments_id_seq minvalue 0 START WITH 1`),
-//             trx.raw(`SELECT setval('teachers_id_seq', 0)`),
-//             trx.raw(`SELECT setval('class_list_id_seq', 0)`),
-//             trx.raw(`SELECT setval('classroom_users_id_seq', 0)`),
-//             trx.raw(`SELECT setval('updates_id_seq', 0)`),
-//             trx.raw(`SELECT setval('homework_id_seq', 0)`),
-//             trx.raw(`SELECT setval('updates_comments_id_seq', 0)`),
-//             trx.raw(`SELECT setval('homework_comments_id_seq', 0)`)
-//            ])
-//          )
-//        )
-//      }
-
    function seedTeachers(db, teachers) {
       return db
           .insert(teachers)
@@ -362,84 +329,6 @@ function seedHomeworkComments(db, homeworkComments) {
        .insert(homeworkComments)
        .into('homework_comments');
 }
-
-   //   function seedUsers(db, users) {
-   //       const preppedUsers = users.map(user => ({
-   //        ...user,
-   //      password: bcrypt.hashSync(user.password, 1)
-   //    }))
-   //    return db.into('classroom_users').insert(preppedUsers)
-   //      .then(() =>
-   //        // update the auto sequence to stay in sync
-   //        db.raw(
-   //          `SELECT setval('classroom_users_id_seq', ?)`,
-   //          [users[users.length - 1].id],
-   //        )
-   //      )
-   //  }
-
-
-   //  function seedUpdatesTables(db, users, updates, comments=[]) {
-   //    // use a transaction to group the queries and auto rollback on any failure
-   //    return db.transaction(async trx => {
-   //      await seedUsers(trx, users)
-   //      await trx.into('updates').insert(updates)
-   //      // update the auto sequence to match the forced id values
-   //      await trx.raw(
-   //       `SELECT setval('updates_id_seq', ?)`,
-   //        [updates[updates.length - 1].id],
-   //      )
-   //      // only insert comments if there are some, also update the sequence counter
-   //      if (comments.length) {
-   //        await trx.into('updates_comments').insert(comments)
-   //        await trx.raw(
-   //          `SELECT setval('updates_comments_id_seq', ?)`,
-   //          [comments[comments.length - 1].id],
-   //        )
-   //      }
-   //    })
-   //  }
-
-
-   //  function seedHomeworkTables(db, users, homework, comments=[]) {
-   //    // use a transaction to group the queries and auto rollback on any failure
-   //    return db.transaction(async trx => {
-   //      await seedUsers(trx, users)
-   //      await trx.into('homework').insert(homework)
-   //      // update the auto sequence to match the forced id values
-   //      await trx.raw(
-   //       `SELECT setval('homework_id_seq', ?)`,
-   //        [homework[homework.length - 1].id],
-   //      )
-   //      // only insert comments if there are some, also update the sequence counter
-   //      if (comments.length) {
-   //        await trx.into('updates_comments').insert(comments)
-   //        await trx.raw(
-   //          `SELECT setval('updates_comments_id_seq', ?)`,
-   //          [comments[comments.length - 1].id],
-   //        )
-   //      }
-   //    })
-   //  }
-
-   // function seedMaliciousUpdate(db, user, update) {
-   //    return seedUsers(db, [user])
-   //      .then(() =>
-   //        db
-   //          .into('updates')
-   //          .insert([update])
-   //      )
-   //  }
-
-   //  function seedMaliciousHomework(db, user, homework) {
-   //    return seedUsers(db, [user])
-   //      .then(() =>
-   //        db
-   //          .into('homework')
-   //          .insert([homework])
-   //      )
-   //  }
-
 
 
    function makeAuthHeader(user, secret = process.env.JWT_SECRET) {

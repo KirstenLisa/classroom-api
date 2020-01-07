@@ -1,7 +1,7 @@
 const knex = require('knex')
 const jwt = require('jsonwebtoken')
 const app = require('../src/app')
-const { seedTeachers, seedClassList, seedUsers, seedHomework, seedHomeworkComments, makeMaliciousComment, makeHomeworkCommentsArray, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { makeAuthHeader, seedTeachers, seedClassList, seedUsers, seedHomework, seedHomeworkComments, makeMaliciousComment, makeHomeworkCommentsArray, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 
 describe('Auth Endpoints', function() {
@@ -89,6 +89,7 @@ describe('Auth Endpoints', function() {
                 process.env.JWT_SECRET,
             {
             subject: testUser.username,
+            expiresIn: process.env.JWT_EXPIRY,
             algorithm: 'HS256',
             }
             )
@@ -99,6 +100,45 @@ describe('Auth Endpoints', function() {
                 authToken: expectedToken,
                 })
             })
+          })
+        })
+
+  describe(`POST /api/auth/refresh`, () => {
+    const testTeachers = makeTeachersArray()
+    const testClasses = makeClassesArray()
+    const testUsers = makeUsersArray()
+    const testUser = testUsers[0]
+
+
+      beforeEach('insert teachers', () =>
+        seedTeachers(db, testTeachers)
+      );
+
+      beforeEach('insert classes', () =>
+        seedClassList(db, testClasses)
+      );
+
+      beforeEach('insert users', () =>
+        seedUsers(db, testUsers)
+        );
+          
+      it(`responds 200 and JWT auth token using secret`, () => {
+                const expectedToken = jwt.sign(
+                  { user_id: testUser.user_id },
+                  process.env.JWT_SECRET,
+                  {
+                    subject: testUser.username,
+                    expiresIn: process.env.JWT_EXPIRY,
+                    algorithm: 'HS256',
+                  }
+                )
+                return supertest(app)
+                  .post('/api/auth/refresh')
+                  .set('Authorization', makeAuthHeader(testUser))
+                  .expect(200, {
+                    authToken: expectedToken,
+                  })
+              })
+            })
     })
-  })
-})
+  

@@ -2,8 +2,7 @@ const { expect } = require('chai')
 const knex = require('knex')
 const bcrypt = require('bcryptjs')
 const app = require('../src/app')
-const xss = require('xss')
-const { makeMaliciousUser, seedUsers, seedTeachers, seedClassList, seedHomework, makeAuthHeader, makeMaliciousHomework, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
+const { seedUsers, seedTeachers, seedClassList, seedHomework, makeAuthHeader, makeMaliciousHomework, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Users service object`, function() {
 
@@ -223,23 +222,6 @@ describe(`Users service object`, function() {
                 )
             })
     
-        
-         
-        // it('removes XSS attack content', () => {
-        //   const { maliciousUser, expectedUser } = makeMaliciousUser();
-        //     return supertest(app)
-        //       .post('/api/users')
-        //       .send(maliciousUser)
-        //       .expect(201)
-        //       .expect(res => {
-        //         expect(res.body.fullname).to.eql(expectedUser.fullname)
-        //         expect(res.body.username).to.eql(expectedUser.username)
-        //         expect(res.body.password).to.eql(expectedUser.password)
-        //         expect(res.body.class_id).to.eql(expectedUser.class_id)
-        //         expect(res.body.user_type).to.eql(expectedUser.user_type)
-                  
-        //            })
-        //         })
              }) 
                        
 

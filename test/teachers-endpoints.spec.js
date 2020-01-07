@@ -1,7 +1,5 @@
-const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
-const xss = require('xss')
 const { makeTeachersArray } = require('./test-helpers')
 
 describe(`Teachers service object`, function() {

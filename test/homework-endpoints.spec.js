@@ -1,7 +1,6 @@
 const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
-const xss = require('xss')
 const { seedUsers, seedTeachers, seedClassList, seedHomework, makeAuthHeader, makeMaliciousHomework, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 describe(`Homework service object`, function() {
@@ -11,7 +10,6 @@ describe(`Homework service object`, function() {
     const testTeachers = makeTeachersArray()
     const testClasses = makeClassesArray()
     const testUsers = makeUsersArray()
-    const testHomework = makeHomeworkArray()
 
 
     before(() => {
@@ -434,8 +432,6 @@ describe(`PATCH /api/homework/:homework_id`, () => {
       ...testHomework[idToUpdate - 1],
       ...updatedHomework
                   }
-    console.log('TEST USER')
-    console.log(makeAuthHeader(testUsers[0]))
                            
     return supertest(app)
       .patch(`/api/homework/${idToUpdate}`)
