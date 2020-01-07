@@ -4,7 +4,7 @@ const app = require('../src/app')
 const { seedTeachers, seedClassList, seedUsers, seedHomework, seedHomeworkComments, makeMaliciousComment, makeHomeworkCommentsArray, makeHomeworkArray, makeTeachersArray, makeClassesArray, makeUsersArray } = require('./test-helpers')
 
 
-describe.only('Auth Endpoints', function() {
+describe('Auth Endpoints', function() {
     let db
 
     const testUsers = makeUsersArray()

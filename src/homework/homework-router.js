@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const xss = require('xss')
 const HomeworkService = require('./homework-service')
-const { requireAuth } = require('../middleware/basic-auth')
+const { requireAuth } = require('../middleware/jwt-auth')
 
 const homeworkRouter = express.Router()
 const jsonBodyParser = express.json()

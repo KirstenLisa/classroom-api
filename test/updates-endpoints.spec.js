@@ -43,35 +43,29 @@ describe(`Updates service object`, function() {
       );
 
 
-    it(`responds with 401 'Missing basic token' when no basic token`, () => {
+    it(`responds 401 'Missing bearer token' when no bearer token`, () => {
       return supertest(app)
         .get(`/api/updates`)
-        .expect(401, { error: `Missing basic token` })
+        .expect(401, { error: `Missing bearer token` })
            })
 
-    it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
-      const userNoCreds = { username: '', password: '' }
+    it(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+      const validUser = testUsers[0]
+      const invalidSecret = 'bad-secret'
         return supertest(app)
           .get(`/api/updates`)
-          .set('Authorization', makeAuthHeader(userNoCreds))
+          .set('Authorization', makeAuthHeader(validUser, invalidSecret))
           .expect(401, { error: `Unauthorized request` })
           })
 
-    it(`responds 401 'Unauthorized request' when invalid user`, () => {
-      const userInvalidCreds = { username: 'user-not', password: 'existy' }
+    it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
+      const invalidUser = { username: 'user-not-existy', id: 1 }
         return supertest(app)
           .get(`/api/updates`)
-          .set('Authorization', makeAuthHeader(userInvalidCreds))
+          .set('Authorization', makeAuthHeader(invalidUser))
           .expect(401, { error: `Unauthorized request` })
           })
 
-    it(`responds 401 'Unauthorized request' when invalid password`, () => {
-      const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
-        return supertest(app)
-          .get(`/api/updates`)
-          .set('Authorization', makeAuthHeader(userInvalidPass))
-          .expect(401, { error: `Unauthorized request` })
-          })
 
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
@@ -106,33 +100,26 @@ describe(`Updates service object`, function() {
         );  
 
 
-      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+      it(`responds 401 'Missing bearer token' when no bearer token`, () => {
         return supertest(app)
           .get(`/api/updates`)
-          .expect(401, { error: `Missing basic token` })
+          .expect(401, { error: `Missing bearer token` })
              })
   
-      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
-        const userNoCreds = { username: '', password: '' }
+      it(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+        const validUser = testUsers[0]
+        const invalidSecret = 'bad-secret'
           return supertest(app)
             .get(`/api/updates`)
-            .set('Authorization', makeAuthHeader(userNoCreds))
+            .set('Authorization', makeAuthHeader(validUser, invalidSecret))
             .expect(401, { error: `Unauthorized request` })
             })
   
-      it(`responds 401 'Unauthorized request' when invalid user`, () => {
-        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+      it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
+        const invalidUser = { username: 'user-not-existy', id: 1 }
           return supertest(app)
             .get(`/api/updates`)
-            .set('Authorization', makeAuthHeader(userInvalidCreds))
-            .expect(401, { error: `Unauthorized request` })
-            })
-  
-      it(`responds 401 'Unauthorized request' when invalid password`, () => {
-        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
-          return supertest(app)
-            .get(`/api/updates`)
-            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .set('Authorization', makeAuthHeader(invalidUser))
             .expect(401, { error: `Unauthorized request` })
             })
 
@@ -204,35 +191,29 @@ describe(`Updates service object`, function() {
     seedUsers(db, testUsers)
     );
 
-      it(`responds with 401 'Missing basic token' when no basic token`, () => {
+    it(`responds 401 'Missing bearer token' when no bearer token`, () => {
         return supertest(app)
           .get(`/api/updates/123`)
-          .expect(401, { error: `Missing basic token` })
+          .expect(401, { error: `Missing bearer token` })
              })
   
-      it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
-        const userNoCreds = { username: '', password: '' }
+    it(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+      const validUser = testUsers[0]
+      const invalidSecret = 'bad-secret'
           return supertest(app)
             .get(`/api/updates/123`)
-            .set('Authorization', makeAuthHeader(userNoCreds))
+            .set('Authorization', makeAuthHeader(validUser, invalidSecret))
             .expect(401, { error: `Unauthorized request` })
             })
   
-      it(`responds 401 'Unauthorized request' when invalid user`, () => {
-        const userInvalidCreds = { username: 'user-not', password: 'existy' }
+    it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
+      const invalidUser = { username: 'user-not-existy', id: 1 }
           return supertest(app)
             .get(`/api/updates/123`)
-            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .set('Authorization', makeAuthHeader(invalidUser))
             .expect(401, { error: `Unauthorized request` })
             })
   
-      it(`responds 401 'Unauthorized request' when invalid password`, () => {
-        const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
-          return supertest(app)
-            .get(`/api/updates/123`)
-            .set('Authorization', makeAuthHeader(userInvalidPass))
-            .expect(401, { error: `Unauthorized request` })
-            })
 
       it(`responds 404 the update doesn't exist`, () => {
         return supertest(app)
@@ -267,35 +248,29 @@ describe(`Updates service object`, function() {
         seedUpdates(db, testUpdates)
         );  
 
-        it(`responds with 401 'Missing basic token' when no basic token`, () => {
+        it(`responds 401 'Missing bearer token' when no bearer token`, () => {
           return supertest(app)
             .get(`/api/updates/1`)
-            .expect(401, { error: `Missing basic token` })
+            .expect(401, { error: `Missing bearer token` })
                })
     
-        it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
-          const userNoCreds = { username: '', password: '' }
+        it(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+          const validUser = testUsers[0]
+          const invalidSecret = 'bad-secret'
             return supertest(app)
               .get(`/api/updates/1`)
-              .set('Authorization', makeAuthHeader(userNoCreds))
+              .set('Authorization', makeAuthHeader(validUser, invalidSecret))
               .expect(401, { error: `Unauthorized request` })
               })
     
-        it(`responds 401 'Unauthorized request' when invalid user`, () => {
-          const userInvalidCreds = { username: 'user-not', password: 'existy' }
+        it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
+          const invalidUser = { username: 'user-not-existy', id: 1 }
             return supertest(app)
               .get(`/api/updates/1`)
-              .set('Authorization', makeAuthHeader(userInvalidCreds))
+              .set('Authorization', makeAuthHeader(invalidUser))
               .expect(401, { error: `Unauthorized request` })
               })
     
-        it(`responds 401 'Unauthorized request' when invalid password`, () => {
-          const userInvalidPass = { username: testUsers[0].username, password: 'wrong' }
-            return supertest(app)
-              .get(`/api/updates/1`)
-              .set('Authorization', makeAuthHeader(userInvalidPass))
-              .expect(401, { error: `Unauthorized request` })
-              })
 
     it('responds with 200 and the specified update', () => {
       const updateId = 2

@@ -13,7 +13,7 @@ const serializeUser = user => ({
   user_id: user.user_id,
   fullname: xss(user.fullname),
   username: xss(user.username),
-  password: xss(user.password),
+
   class_id: user.class_id,
   user_type: xss(user.user_type)
 })
@@ -34,32 +34,54 @@ usersRouter
     const { fullname, username, password, class_id, user_type } = req.body
     const newUser = { fullname, username, password, class_id, user_type }
 
+   
+
     for (const [key, value] of Object.entries(newUser)) {
       if (value == null) {
         return res.status(400).json({
-          error: { message: `Missing '${key}' in request body` }
+          error: `Missing '${key}' in request body`
         })
       }
     }
 
-    newUser.fullname = fullname;
-    newUser.username = username;
-    newUser.password = password;
-    newUser.class_id = class_id;
-    newUser.user_type = user_type;
+    const passwordError = UsersService.validatePassword(password)
 
-    UsersService.insertUser(
+    if (passwordError)
+      return res.status(400).json({ error: passwordError })
+
+    UsersService.hasUserWithUserName(
       req.app.get('db'),
-      newUser
-    )
-      .then(user => {
-        res
-          .status(201)
-          .location(path.posix.join(req.originalUrl, `/${user.user_id}`))
-          .json(serializeUser(user))
+        username
+        )
+      .then(hasUserWithUserName => {
+        if (hasUserWithUserName)
+          return res.status(400).json({ error: `Username already taken` })
+        
+          return UsersService.hashPassword(password)
+          .then(hashedPassword => {
+            const newUser = {
+              fullname,
+              username,
+              password: hashedPassword,
+              class_id,
+              user_type
+            }
+
+            return UsersService.insertUser(
+              req.app.get('db'),
+              newUser
+            )
+              .then(user => {
+                res
+                  .status(201)
+                  .location(path.posix.join(req.originalUrl, `/${user.user_id}`))
+                  .json(serializeUser(user))
+              })
+          })
       })
       .catch(next)
   })
+  
 
 usersRouter
   .route('/:user_id')
