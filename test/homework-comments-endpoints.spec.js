@@ -118,12 +118,10 @@ describe(`Homework-comments service object`, function() {
 
     context('Given there are NO homework-comments in the database', () => {
 
-      it(`responds 404 homework doesn't exist`, () => {
+      it(`responds 200 and an empty list`, () => {
         return supertest(app)
           .get(`/api/homework-comments/1234`)
-          .expect(404, {
-          error: { message: `Comment doesn't exist` }
-               })
+          .expect(200, [])
            })
        })
 

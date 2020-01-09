@@ -162,14 +162,13 @@ describe(`Updates-comments service object`, function() {
     
       
 
-      it(`responds 404 the update doesn't exist`, () => {
+      it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get(`/api/updates-comments/123`)
-          .expect(404, {
-          error: { message: `Comment doesn't exist` }
-               })
-           })
-       })
+          .expect(200, [])
+        })
+    })
+
 
     context('Given there ARE updates-comments in the database', () => {
 
