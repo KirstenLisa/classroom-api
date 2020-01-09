@@ -41,7 +41,6 @@ homeworkCommentsRouter
       }
     }
 
-    console.log(req.username)
     newHomeworkComment.comment = comment;
     newHomeworkComment.user_name = user_name;
     newHomeworkComment.date = date;

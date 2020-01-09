@@ -12,7 +12,6 @@ const HomeworkCommentsService = {
         
         
     },
-
     insertComment(knex, newComment) {
         return knex
           .insert(newComment)

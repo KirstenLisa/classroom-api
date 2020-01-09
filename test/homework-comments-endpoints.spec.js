@@ -165,7 +165,7 @@ describe(`Homework-comments service object`, function() {
       const expectedComment = testHomeworkComments[commentId - 1]
         return supertest(app)
           .get(`/api/homework-comments/${commentId}`)
-          .expect(200, expectedComment)
+          .expect(200, [expectedComment])
          })
        })
       })
@@ -203,12 +203,12 @@ describe(`Homework-comments service object`, function() {
     it(`creates a comment, responding with 201 and the new comment`, function() {
       this.retries(3)
       const newHomeworkComment = {
-        comment_id: 5,
+        comment_id: 1,
         comment: 'Test new comment homework',
         user_name: 'test-username-1',
         date: '2019-04-22T16:28:32.615Z',
         user_id: 1,
-        page_id: 11
+        page_id: 1
     }
                                             
       return supertest(app)
@@ -227,7 +227,7 @@ describe(`Homework-comments service object`, function() {
           .then(postRes =>
             supertest(app)
             .get(`/api/homework-comments/${postRes.body.comment_id}`)
-            .expect(postRes.body)
+            .expect([postRes.body])
           )
         })
                                                         

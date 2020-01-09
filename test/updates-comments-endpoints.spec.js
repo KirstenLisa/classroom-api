@@ -206,7 +206,7 @@ describe(`Updates-comments service object`, function() {
       const expectedComment = testUpdatesComments[commentId - 1]
         return supertest(app)
           .get(`/api/updates-comments/${commentId}`)
-          .expect(200, expectedComment)
+          .expect(200, [expectedComment])
          })
        })
       })
@@ -269,7 +269,7 @@ describe(`Updates-comments service object`, function() {
             .then(postRes =>
               supertest(app)
               .get(`/api/updates-comments/${postRes.body.comment_id}`)
-              .expect(postRes.body)
+              .expect([postRes.body])
             )
           })
                                 
