@@ -6,12 +6,19 @@ const UsersService = {
         return knex.select('*').from('classroom_users')
     },
 
-    getById(knex, id) {
-        return knex.from('classroom_users')
-        .select('*')
-        .where('user_id', id)
-        .first()
-      },
+    // getById(knex, id) {
+    //     return knex.from('classroom_users')
+    //     .select('*')
+    //     .where('user_id', id)
+    //     .first()
+    //   },
+    
+    getByName(knex, username) {
+      return knex.from('classroom_users')
+      .select('*')
+      .where('username', username)
+      .first()
+    },
 
     hasUserWithUserName(db, username) {
       return db('classroom_users')
@@ -21,8 +28,8 @@ const UsersService = {
       },
 
     validatePassword(password) {
-      if (password.length < 8) {
-        return 'Password must be longer than 8 characters'
+      if (password.length < 7) {
+        return 'Password must be longer than 7 characters'
         }
       if (password.length > 72) {
         return 'Password must be less than 72 characters'
