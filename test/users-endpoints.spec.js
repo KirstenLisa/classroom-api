@@ -70,18 +70,18 @@ describe(`Users service object`, function() {
       })
 
 
-      it(`responds 400 'Password must be longer than 8 characters' when empty password`, () => {
+      it(`responds 400 'Password must be longer than 7 characters' when empty password`, () => {
         const userShortPassword = {
           fullname: 'Test new user',
           username: 'test new username',
-          password: '1234567',
+          password: '123456',
           class_id: 2,
           user_type: 'student'
         }
         return supertest(app)
           .post('/api/users')
           .send(userShortPassword)
-          .expect(400, { error: `Password must be longer than 8 characters` })
+          .expect(400, { error: `Password must be longer than 7 characters` })
           })
 
       it(`responds 400 'Password must be less than 72 characters' when long password`, () => {
@@ -200,7 +200,7 @@ describe(`Users service object`, function() {
                 db
                   .from('classroom_users')
                   .select('*')
-                  .where({ user_id: res.body.user_id })
+                  .where({ username: res.body.username })
                   .first()
                   .then(row => {
                     expect(res.body.fullname).to.eql(newUser.fullname)
