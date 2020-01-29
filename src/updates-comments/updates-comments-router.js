@@ -80,7 +80,6 @@ updatesCommentsRouter
       .catch(next)
   })
   .get((req, res, next) => {
-    console.log(res.comment)
     res.json(res.comment.map(comment => serializeUpdateComment(comment)))
  
   })

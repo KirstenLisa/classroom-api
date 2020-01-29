@@ -1,12 +1,8 @@
 const express = require('express')
-const path = require('path')
-const uuid = require('uuid/v4')
 const xss = require('xss')
 const TeachersService = require('./teachers-service')
-const logger = require('../logger')
 
 const teachersRouter = express.Router()
-const jsonBodyParser = express.json()
 
 const serializeTeacher = teacher => ({
     teacher_name: xss(teacher.teacher_name),

@@ -92,8 +92,6 @@ describe(`Users service object`, function() {
           class_id: 2,
           user_type: 'student'
           }
-          // console.log(userLongPassword)
-          // console.log(userLongPassword.password.length)
           return supertest(app)
             .post('/api/users')
             .send(userLongPassword)

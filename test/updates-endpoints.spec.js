@@ -581,10 +581,6 @@ describe(`PATCH /api/update/:update_id`, () => {
                            })
                         })
                       })
-        
-
-
-
 
     })
 

@@ -510,8 +510,6 @@ describe(`PATCH /api/homework/:homework_id`, () => {
      
       it(`creates a homework, responding with 201 and the new homework`, function() {
         this.retries(3)
-        console.log('TEST USER')
-        console.log(makeAuthHeader(testUsers[0]))
         const newHomework = {
           homework_id: 11,
           subject: 'Math',
