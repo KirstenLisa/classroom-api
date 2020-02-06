@@ -5,7 +5,7 @@ Server is used for back end of app and connects to client.
 
 URL: https://evening-dawn-46088.herokuapp.com/api
 
-Technoligies Used
+Technologies Used
 Client side: React, JavaScript, Zeit, HTML and CSS.
 
 Server side: Express.js, Node.js, PostgreSQL and Heroku.
